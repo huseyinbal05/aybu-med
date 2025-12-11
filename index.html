@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="transition-colors duration-300">
 <head>
@@ -292,14 +291,31 @@
         const CLINICAL_KEYWORDS = ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Theme Init
-            const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                updateThemeIcon(true);
-            } else {
-                updateThemeIcon(false);
+            // Theme Init & System Listener
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            function applyTheme() {
+                const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+                // If saved is 'dark', OR if nothing saved and system is dark -> Dark Mode
+                if (savedTheme === 'dark' || (!savedTheme && mediaQuery.matches)) {
+                    document.documentElement.classList.add('dark');
+                    updateThemeIcon(true);
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    updateThemeIcon(false);
+                }
             }
+
+            // Apply on load
+            applyTheme();
+
+            // Listen for system changes (e.g. sunset/sunrise automatic switch)
+            mediaQuery.addEventListener('change', () => {
+                // Only follow system if user hasn't manually overridden via the button
+                if (!localStorage.getItem(STORAGE_KEY_THEME)) {
+                    applyTheme();
+                }
+            });
 
             // Lang Init
             const savedLang = localStorage.getItem(STORAGE_KEY_LANG);
