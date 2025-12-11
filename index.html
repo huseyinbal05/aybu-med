@@ -885,9 +885,11 @@
                     if (s.includes("komite sorumluları")) return true;
                     if (s.match(/^week\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*week$/)) return true;
+                    if (s === 'week') return true; // Added: standalone "week"
                     if (s.match(/^hafta\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*hafta$/)) return true;
                     if (s.match(/^\d+\.\s*hafta$/)) return true;
+                    if (s === 'hafta') return true; // Added: standalone "hafta"
                 }
             }
             return false;
@@ -899,6 +901,7 @@
             if (s.includes("GMT")) return true;
             if (s.startsWith("(Thu") || s.startsWith("(Mon") || s.startsWith("(Tue") || s.startsWith("(Wed") || s.startsWith("(Fri")) return true;
             if (s.match(/^\d+$/)) return true; 
+            if (s.toLowerCase() === 'week' || s.toLowerCase() === 'hafta') return true; // Added safety check
             return false;
         }
 
