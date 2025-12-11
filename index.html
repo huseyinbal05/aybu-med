@@ -362,7 +362,12 @@
             initApp();
             
             if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('installBannerDismissed')) {
-                document.getElementById('installBanner').classList.remove('hidden');
+                const banner = document.getElementById('installBanner');
+                banner.classList.remove('hidden');
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 10000);
             }
         });
 
