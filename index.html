@@ -1,5 +1,6 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="transition-colors duration-300">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,16 +11,30 @@
     <meta name="theme-color" content="#ffffff">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         
         .glass-header {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-header {
+            background: rgba(15, 23, 42, 0.96);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.8);
         }
 
         /* Timeline Connector Logic */
@@ -28,24 +43,15 @@
             background: #e2e8f0;
             z-index: 0;
         }
+        .dark .time-connector { background: #334155; }
         
-        /* Mobile: Line is absolute relative to the icon */
         .mobile-connector {
-            left: 23px;
-            top: 45px;
-            bottom: -20px;
-            width: 2px;
+            left: 23px; top: 45px; bottom: -20px; width: 2px;
         }
 
-        /* Desktop: Line is centered in the axis column */
         @media (min-width: 768px) {
             .desktop-connector {
-                left: 50%;
-                transform: translateX(-50%);
-                top: 3rem;
-                bottom: -2rem;
-                width: 2px;
-                display: block;
+                left: 50%; transform: translateX(-50%); top: 3rem; bottom: -2rem; width: 2px; display: block;
             }
         }
 
@@ -57,12 +63,9 @@
         }
         .card-enter { opacity: 0; animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        .anim-slide-right { animation: slideInRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .anim-slide-left { animation: slideInLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-
         .glow-border { position: relative; background: white; z-index: 1; transition: transform 0.3s ease; }
+        .dark .glow-border { background: #1e293b; } /* slate-800 */
+        
         .glow-border::before {
             content: ""; position: absolute; inset: -2px; border-radius: 20px;
             background: linear-gradient(135deg, #60a5fa, #8b5cf6, #3b82f6);
@@ -74,20 +77,23 @@
         .btn-press:active { transform: scale(0.92); }
 
         .progress-container { height: 3px; width: 100%; background: #f1f5f9; position: absolute; bottom: 0; left: 0; }
+        .dark .progress-container { background: #1e293b; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); width: 0%; transition: width 1s linear; border-radius: 0 2px 2px 0; }
 
         .toggle-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
-        .toggle-btn.active { background-color: white; color: #2563EB; border-color: #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .toggle-btn.inactive { background-color: transparent; color: #94a3b8; }
-
+        
         .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
         .animate-float { animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* Search Styles */
+        #searchContainer { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 0; overflow: hidden; opacity: 0; }
+        #searchContainer.open { max-height: 80px; opacity: 1; margin-top: 0.5rem; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-32">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300">
 
     <!-- Install Notification Bar -->
     <div id="installBanner" class="hidden bg-indigo-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-md relative z-50 cursor-pointer hover:bg-indigo-700 transition-colors" onclick="openInstallModal()">
@@ -102,99 +108,137 @@
 
     <!-- Header -->
     <header class="glass-header sticky top-0 z-40 px-4 md:px-8 pt-3 pb-2 shadow-sm transition-all duration-300">
-        <div class="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="max-w-6xl mx-auto flex flex-col gap-3">
             
-            <!-- Top Row: Title & Language Toggle -->
-            <div class="flex items-center justify-between md:justify-start gap-4">
-                <div class="flex items-center gap-3 cursor-default">
-                    <div id="phase-icon" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-blue-200/50 transform transition-transform hover:rotate-3">
-                        D1
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Top Row: Title & Toggles -->
+                <div class="flex items-center justify-between md:justify-start gap-4 w-full md:w-auto">
+                    <div class="flex items-center gap-3 cursor-default">
+                        <div id="phase-icon" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-blue-200/50 transform transition-transform hover:rotate-3">
+                            D1
+                        </div>
+                        <div>
+                            <h1 id="txt-title" class="font-extrabold text-sm md:text-base leading-tight text-slate-900 dark:text-white tracking-tight">Phase I</h1>
+                            <p id="txt-subtitle" class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-bold tracking-wide uppercase">AYBU Medicine</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 id="txt-title" class="font-extrabold text-sm md:text-base leading-tight text-slate-900 tracking-tight">Phase I</h1>
-                        <p id="txt-subtitle" class="text-[10px] md:text-xs text-slate-500 font-bold tracking-wide uppercase">AYBU Medicine</p>
+
+                    <div class="flex items-center gap-2">
+                         <!-- Language Toggle -->
+                        <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg cursor-pointer select-none border border-slate-200 dark:border-slate-700" onclick="toggleLanguage()">
+                            <div id="lang-tr" class="px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 dark:text-slate-500 transition-all">TR</div>
+                            <div id="lang-en" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm transition-all">EN</div>
+                        </div>
+                        
+                        <!-- Dark Mode Toggle -->
+                        <button onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                            <i id="darkModeIcon" class="fas fa-moon text-xs"></i>
+                        </button>
+
+                        <!-- View Toggle (Day/Week) -->
+                        <button onclick="toggleViewMode()" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
+                            <i class="fas fa-columns text-xs"></i>
+                        </button>
+                        
+                        <!-- Search Button -->
+                         <button onclick="toggleSearch()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                            <i class="fas fa-search text-xs"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Universal Language Toggle (Segmented Control) -->
-                <div class="flex items-center bg-slate-100 p-1 rounded-lg cursor-pointer select-none border border-slate-200" onclick="toggleLanguage()">
-                    <div id="lang-tr" class="px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 transition-all">TR</div>
-                    <div id="lang-en" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-800 shadow-sm transition-all">EN</div>
+                <!-- Date Controls -->
+                <div class="flex items-center justify-between gap-2 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 dark:border-slate-700/50 shadow-sm w-full md:w-auto md:min-w-[320px]">
+                    <button onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    
+                    <div class="relative flex-1 group h-10">
+                        <input type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
+                        <div class="flex items-center justify-center gap-3 w-full h-full bg-white dark:bg-slate-700 border border-slate-200/60 dark:border-slate-600 rounded-xl shadow-sm group-hover:border-blue-300 dark:group-hover:border-blue-500 transition-all px-2 cursor-pointer">
+                            <div id="dateDisplay" class="flex-1 text-center select-none"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Date Controls (Centered on Desktop) -->
-            <div class="flex items-center justify-between gap-2 bg-slate-100/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 shadow-sm w-full md:w-auto md:min-w-[320px]">
-                <button onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm hover:text-blue-600 transition-colors">
-                    <i class="fas fa-chevron-left text-xs"></i>
-                </button>
-                
-                <div class="relative flex-1 group h-10">
-                    <input type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
-                    <div class="flex items-center justify-center gap-3 w-full h-full bg-white border border-slate-200/60 rounded-xl shadow-sm group-hover:border-blue-300 group-active:bg-slate-50 transition-all px-2 cursor-pointer">
-                        <div id="dateDisplay" class="flex-1 text-center select-none"></div>
-                    </div>
+            <!-- Search Bar -->
+            <div id="searchContainer" class="w-full">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" placeholder="Search classes, rooms, topics..." 
+                           class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all text-sm font-medium placeholder:text-slate-400 dark:text-slate-200"
+                           oninput="filterSchedule(this.value)">
                 </div>
-
-                <button onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm hover:text-blue-600 transition-colors">
-                    <i class="fas fa-chevron-right text-xs"></i>
-                </button>
             </div>
-            
         </div>
+        
         <div class="progress-container">
             <div id="dayProgressBar" class="progress-bar"></div>
         </div>
     </header>
 
-    <main class="w-full max-w-4xl mx-auto p-4 md:p-8">
+    <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
 
-        <!-- Schedule Container -->
-        <!-- Switched from grid to standard block flow for the timeline approach -->
+        <!-- Schedule Container (Day View) -->
         <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0"></div>
+
+        <!-- Week View Container -->
+        <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 md:grid-cols-5 gap-4"></div>
 
         <!-- Empty State / Error State -->
         <div id="emptyState" class="hidden text-center py-24 px-6 card-enter">
-            <div id="emptyIcon" class="text-6xl text-slate-200 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
-            <h3 id="txt-empty-title" class="text-2xl font-bold text-slate-700">No Classes Found</h3>
-            <p id="txt-empty-desc" class="text-slate-400 text-base max-w-[280px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
+            <div id="emptyIcon" class="text-6xl text-slate-200 dark:text-slate-700 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
+            <h3 id="txt-empty-title" class="text-2xl font-bold text-slate-700 dark:text-slate-300">No Classes Found</h3>
+            <p id="txt-empty-desc" class="text-slate-400 dark:text-slate-500 text-base max-w-[280px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
+        </div>
+
+        <!-- No Search Results -->
+        <div id="noSearchResults" class="hidden text-center py-16 px-6 card-enter">
+             <div class="text-4xl text-slate-200 dark:text-slate-700 mb-4 inline-block"><i class="fas fa-search"></i></div>
+             <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">No results found</h3>
+             <p class="text-slate-400 dark:text-slate-500 text-sm">Try a different keyword.</p>
         </div>
 
         <!-- Loading -->
         <div id="loadingState" class="hidden text-center py-32">
             <div class="inline-block relative">
-                <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <div class="w-16 h-16 border-4 border-blue-100 dark:border-slate-700 border-t-blue-600 rounded-full animate-spin"></div>
             </div>
-            <p id="txt-loading" class="text-slate-400 text-xs mt-6 font-bold tracking-widest uppercase animate-pulse">Loading...</p>
+            <p id="txt-loading" class="text-slate-400 dark:text-slate-500 text-xs mt-6 font-bold tracking-widest uppercase animate-pulse">Loading...</p>
         </div>
 
     </main>
     
     <!-- Install Modal -->
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-[2rem] max-w-sm w-full p-6 shadow-2xl modal-enter relative border border-white/20">
-            <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors"><i class="fas fa-times text-xl"></i></button>
-            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 mb-6 text-center">Install App</h3>
-            <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-100 transition-colors">
-                <div class="text-3xl text-slate-800"><i class="fab fa-apple"></i></div>
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl modal-enter relative border border-white/20 dark:border-slate-700">
+            <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App</h3>
+            <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
+                <div class="text-3xl text-slate-800 dark:text-slate-200"><i class="fab fa-apple"></i></div>
                 <div>
-                    <h4 class="font-bold text-slate-700 text-sm mb-1">iOS (Safari)</h4>
-                    <p id="txt-install-ios" class="text-xs text-slate-500 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">iOS (Safari)</h4>
+                    <p id="txt-install-ios" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p>
                 </div>
             </div>
-            <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-green-100 transition-colors">
+            <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-green-100 transition-colors">
                 <div class="text-3xl text-green-500"><i class="fab fa-android"></i></div>
                 <div>
-                    <h4 class="font-bold text-slate-700 text-sm mb-1">Android (Chrome)</h4>
-                    <p id="txt-install-android" class="text-xs text-slate-500 leading-relaxed">1. Tap Menu <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Install App'</p>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">Android (Chrome)</h4>
+                    <p id="txt-install-android" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Menu <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Install App'</p>
                 </div>
             </div>
-            <button onclick="closeInstallModal()" class="mt-6 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-all shadow-lg" id="txt-install-close">Got it</button>
+            <button onclick="closeInstallModal()" class="mt-6 w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-all shadow-lg" id="txt-install-close">Got it</button>
         </div>
     </div>
 
     <!-- Go To Today Button -->
-    <button id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white text-blue-600 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 group md:bottom-10 md:right-10" title="Go to Today">
+    <button id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
         <i class="fas fa-calendar-day text-xl group-hover:scale-110 transition-transform"></i>
     </button>
 
@@ -203,7 +247,9 @@
         let workbookData = null;
         const STORAGE_KEY_DATA = 'aybu_data_v48'; 
         const STORAGE_KEY_LANG = 'aybu_lang_v48';
-        let currentLang = 'EN'; 
+        const STORAGE_KEY_THEME = 'aybu_theme_v1';
+        let currentLang = 'EN';
+        let viewMode = 'day'; // 'day' or 'week'
 
         const TRANSLATIONS = {
             EN: {
@@ -246,6 +292,16 @@
         const CLINICAL_KEYWORDS = ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Theme Init
+            const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                updateThemeIcon(false);
+            }
+
+            // Lang Init
             const savedLang = localStorage.getItem(STORAGE_KEY_LANG);
             if (savedLang) setLanguage(savedLang, false);
             else setLanguage('EN', false);
@@ -259,7 +315,7 @@
                 const parts = e.target.value.split('-');
                 const d = new Date(parts[0], parts[1] - 1, parts[2]); 
                 updateDateDisplay(d);
-                if (workbookData) processSchedule(e.target.value); 
+                refreshView();
             });
 
             setInterval(updateDayProgress, 60000); 
@@ -271,9 +327,84 @@
         });
 
         // --- CORE FUNCTIONS ---
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem(STORAGE_KEY_THEME, isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('darkModeIcon');
+            icon.className = isDark ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-xs';
+        }
+
+        function toggleViewMode() {
+            viewMode = viewMode === 'day' ? 'week' : 'day';
+            const btn = document.getElementById('viewToggleBtn');
+            btn.querySelector('i').className = viewMode === 'day' ? 'fas fa-columns text-xs' : 'fas fa-calendar-day text-xs';
+            refreshView();
+        }
+
+        function refreshView() {
+            const pickerVal = document.getElementById('datePicker').value;
+            if(!pickerVal || !workbookData) return;
+
+            document.getElementById('searchInput').value = '';
+            
+            if (viewMode === 'day') {
+                document.getElementById('scheduleContainer').classList.remove('hidden');
+                document.getElementById('weekContainer').classList.add('hidden');
+                processSchedule(pickerVal);
+            } else {
+                document.getElementById('scheduleContainer').classList.add('hidden');
+                document.getElementById('weekContainer').classList.remove('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+                renderWeekView(pickerVal);
+            }
+        }
+
         function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
         function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
         function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
+        
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            const input = document.getElementById('searchInput');
+            container.classList.toggle('open');
+            if(container.classList.contains('open')) {
+                input.focus();
+            } else {
+                input.value = '';
+                // Only filter day view for now
+                if(viewMode === 'day') filterSchedule('');
+                input.blur();
+            }
+        }
+
+        function filterSchedule(query) {
+            const term = query.toLowerCase().trim();
+            // Filter logic depends on view, but sticking to Day view for search simplicity for now
+            const container = document.getElementById('scheduleContainer');
+            const items = container.querySelectorAll('.card-enter');
+            let hasVisible = false;
+
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    item.classList.remove('hidden');
+                    hasVisible = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            const noResults = document.getElementById('noSearchResults');
+            if (!hasVisible && term.length > 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
 
         function sanitizeData(data) {
             return data.map(row => {
@@ -297,7 +428,7 @@
                 try {
                     workbookData = JSON.parse(cachedData);
                     setLoading(false);
-                    processSchedule(document.getElementById('datePicker').value);
+                    refreshView();
                     document.getElementById('todayBtn').classList.remove('hidden');
                     return; 
                 } catch(e) {}
@@ -312,11 +443,10 @@
                 workbookData = sanitizeData(rawData);
                 try { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(workbookData)); } catch (err) {}
                 setLoading(false);
-                processSchedule(document.getElementById('datePicker').value);
+                refreshView();
                 document.getElementById('todayBtn').classList.remove('hidden');
             } catch (err) {
                 setLoading(false);
-                // Upload section removed. Show connection error state instead.
                 showEmptyState("Connection Error", TRANSLATIONS[currentLang].fetchError, '<i class="fas fa-wifi text-rose-300"></i>');
             }
         }
@@ -358,14 +488,14 @@
             const todayStr = getLocalDateString(now);
             document.getElementById('datePicker').value = todayStr;
             updateDateDisplay(now);
+            document.getElementById('searchInput').value = ''; 
             
             const container = document.getElementById('scheduleContainer');
-            container.classList.remove('anim-slide-left', 'anim-slide-right');
-            container.classList.remove('card-enter');
+            container.classList.remove('anim-slide-left', 'anim-slide-right', 'card-enter');
             void container.offsetWidth; 
             container.classList.add('card-enter');
 
-            if(workbookData) processSchedule(todayStr);
+            refreshView();
         }
 
         window.changeDay = function(offset) {
@@ -373,13 +503,23 @@
             const picker = document.getElementById('datePicker');
             const currentVal = picker.value;
             if (!currentVal) return;
+            document.getElementById('searchInput').value = ''; 
 
             const parts = currentVal.split('-');
             const currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
             
-            do {
-                currentDate.setDate(currentDate.getDate() + offset);
-            } while (currentDate.getDay() === 0 || currentDate.getDay() === 6); 
+            // If in Week view, jump by 7 days
+            const jump = viewMode === 'week' ? (offset * 7) : offset;
+            
+            // Simple date math
+            currentDate.setDate(currentDate.getDate() + jump);
+            
+            // Skip weekends only in Day view
+            if (viewMode === 'day') {
+                while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+                    currentDate.setDate(currentDate.getDate() + (offset > 0 ? 1 : -1));
+                }
+            }
             
             const newDateStr = getLocalDateString(currentDate);
             picker.value = newDateStr;
@@ -389,8 +529,8 @@
             container.classList.remove('anim-slide-left', 'anim-slide-right', 'card-enter');
             void container.offsetWidth; 
 
-            if (workbookData) {
-                processSchedule(newDateStr);
+            refreshView();
+            if (viewMode === 'day' && workbookData) {
                 container.classList.add(offset > 0 ? 'anim-slide-right' : 'anim-slide-left');
             }
         }
@@ -405,16 +545,19 @@
             currentLang = lang;
             localStorage.setItem(STORAGE_KEY_LANG, lang);
             
-            // Update Toggle UI
             const trBtn = document.getElementById('lang-tr');
             const enBtn = document.getElementById('lang-en');
             
+            // Reset base classes
+            const activeClass = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm transition-all";
+            const inactiveClass = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 dark:text-slate-500 transition-all hover:text-slate-600 dark:hover:text-slate-300";
+
             if (lang === 'EN') {
-                enBtn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-blue-600 shadow-sm transition-all";
-                trBtn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 transition-all hover:text-slate-600";
+                enBtn.className = activeClass;
+                trBtn.className = inactiveClass;
             } else {
-                trBtn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-red-600 shadow-sm transition-all";
-                enBtn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 transition-all hover:text-slate-600";
+                trBtn.className = activeClass.replace('text-blue-600', 'text-red-600 dark:text-red-400');
+                enBtn.className = inactiveClass;
             }
 
             const t = TRANSLATIONS[lang];
@@ -435,7 +578,7 @@
                 const d = new Date(parts[0], parts[1] - 1, parts[2]);
                 updateDateDisplay(d);
             }
-            if (shouldProcess && workbookData) processSchedule(document.getElementById('datePicker').value);
+            if (shouldProcess && workbookData) refreshView();
         }
 
         function getLocalDateString(dateObj) {
@@ -459,9 +602,9 @@
             else if (dStr === yesterday.toDateString()) label = TRANSLATIONS[currentLang].yesterday;
             const displayEl = document.getElementById('dateDisplay');
             if (label) {
-                displayEl.innerHTML = `<div class="flex flex-col items-center leading-none"><span class="text-[9px] text-blue-400 font-bold uppercase tracking-widest mb-0.5">${label}</span><span class="text-sm font-bold text-slate-800">${datePart}</span></div>`;
+                displayEl.innerHTML = `<div class="flex flex-col items-center leading-none"><span class="text-[9px] text-blue-400 dark:text-blue-300 font-bold uppercase tracking-widest mb-0.5">${label}</span><span class="text-sm font-bold text-slate-800 dark:text-slate-200">${datePart}</span></div>`;
             } else {
-                displayEl.innerHTML = `<span class="text-sm font-bold text-slate-700">${datePart}</span>`;
+                displayEl.innerHTML = `<span class="text-sm font-bold text-slate-700 dark:text-slate-200">${datePart}</span>`;
             }
         }
 
@@ -505,24 +648,9 @@
             document.getElementById('txt-empty-desc').textContent = msgText;
         }
 
-        function processSchedule(targetDateString) {
-            if (!workbookData) return;
-            const container = document.getElementById('scheduleContainer');
-            const emptyState = document.getElementById('emptyState');
-            container.innerHTML = '';
-            container.classList.add('hidden');
-            emptyState.classList.add('hidden');
-
-            const parts = targetDateString.split('-');
-            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-            const dayOfWeek = dateObj.getDay(); 
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                showEmptyState(TRANSLATIONS[currentLang].weekendTitle, WEEKEND_MESSAGES[currentLang], '<i class="fas fa-couch text-amber-300"></i>');
-                return;
-            }
-
-            document.getElementById('emptyIcon').innerHTML = '<i class="fas fa-calendar-times"></i>';
-            document.getElementById('txt-empty-title').textContent = TRANSLATIONS[currentLang].emptyTitle;
+        // Extracts logic for finding classes for a specific date
+        function getClassesForDate(targetDateString) {
+             if (!workbookData) return [];
 
             let dateRowIndex = -1;
             let targetColIndex = -1;
@@ -544,10 +672,7 @@
                 }
             }
 
-            if (dateRowIndex === -1) {
-                showEmptyState("No Classes Found", [TRANSLATIONS[currentLang].dateNotFound], '<i class="fas fa-calendar-times"></i>');
-                return;
-            }
+            if (dateRowIndex === -1) return [];
 
             let timeColIndex = -1;
             for(let offset = 1; offset <= 4; offset++) {
@@ -625,6 +750,40 @@
                 }
                 r++;
             }
+            return classes;
+        }
+
+        // Day View Handler
+        function processSchedule(targetDateString) {
+            const container = document.getElementById('scheduleContainer');
+            const emptyState = document.getElementById('emptyState');
+            container.innerHTML = '';
+            emptyState.classList.add('hidden');
+
+            const parts = targetDateString.split('-');
+            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            const dayOfWeek = dateObj.getDay(); 
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                showEmptyState(TRANSLATIONS[currentLang].weekendTitle, WEEKEND_MESSAGES[currentLang], '<i class="fas fa-couch text-amber-300"></i>');
+                return;
+            }
+
+            document.getElementById('emptyIcon').innerHTML = '<i class="fas fa-calendar-times"></i>';
+            document.getElementById('txt-empty-title').textContent = TRANSLATIONS[currentLang].emptyTitle;
+
+            const classes = getClassesForDate(targetDateString);
+
+            // Handle special full-day events
+            if (classes.length === 0) {
+                 // Check if it's just not found vs empty
+                 // Since getClassesForDate returns empty for both, we rely on standard empty state
+                 // But we could add logic to distinguish if needed.
+                 // For now, assume if empty array returned, check for date existence handled inside getClasses
+                 // Actually getClasses returns empty if date not found OR no classes. 
+                 // We will stick to generic "No classes".
+                 showEmptyState(TRANSLATIONS[currentLang].emptyTitle, [TRANSLATIONS[currentLang].emptyDesc], '<i class="fas fa-calendar-check"></i>');
+                 return;
+            }
 
             const newYearItems = classes.filter(c => c.type === 'new_year_item');
             if (newYearItems.length > 0) { showEmptyState(TRANSLATIONS[currentLang].newYearTitle, NEW_YEAR_MESSAGES[currentLang], '<i class="fas fa-glass-cheers text-pink-400"></i>'); return; }
@@ -641,13 +800,71 @@
             }
         }
 
+        // Week View Handler
+        function renderWeekView(targetDateString) {
+            const container = document.getElementById('weekContainer');
+            container.innerHTML = '';
+            
+            const parts = targetDateString.split('-');
+            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            
+            // Calculate Monday
+            const day = dateObj.getDay();
+            const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); 
+            const monday = new Date(dateObj.setDate(diff));
+
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+            
+            for(let i=0; i<5; i++) {
+                const currentDay = new Date(monday);
+                currentDay.setDate(monday.getDate() + i);
+                const dateStr = getLocalDateString(currentDay);
+                const classes = getClassesForDate(dateStr);
+                
+                // Column
+                const col = document.createElement('div');
+                col.className = "flex flex-col gap-2 min-h-[200px]";
+                
+                // Header
+                const isToday = dateStr === getLocalDateString(new Date());
+                const headerBg = isToday ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200';
+                
+                const locale = currentLang === 'TR' ? 'tr-TR' : 'en-US';
+                const dayName = currentDay.toLocaleDateString(locale, { weekday: 'short' });
+                const dayNum = currentDay.getDate();
+
+                col.innerHTML = `
+                    <div class="p-3 rounded-xl ${headerBg} shadow-sm border border-slate-100 dark:border-slate-700 mb-2 text-center">
+                        <div class="text-xs uppercase font-bold opacity-80">${dayName}</div>
+                        <div class="text-lg font-bold">${dayNum}</div>
+                    </div>
+                `;
+
+                if(classes.length === 0) {
+                    col.innerHTML += `<div class="text-center text-slate-300 dark:text-slate-600 text-xs py-10 font-bold uppercase tracking-wider">Empty</div>`;
+                } else {
+                    classes.forEach(cls => {
+                        if(cls.type === 'lunch') return; // Skip lunch in week view to save space
+                        
+                        let cardClass = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700";
+                        if(cls.isLab) cardClass = "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/50";
+                        else if(cls.isClinical) cardClass = "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/50";
+                        else if(cls.type === 'freelance') cardClass = "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60";
+
+                        col.innerHTML += `
+                            <div class="p-3 rounded-xl border ${cardClass} shadow-sm text-sm">
+                                <div class="font-mono text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">${cls.time}</div>
+                                <div class="font-bold text-slate-700 dark:text-slate-200 leading-tight line-clamp-3">${cls.lines[0]}</div>
+                            </div>
+                        `;
+                    });
+                }
+                container.appendChild(col);
+            }
+        }
+
         function renderClasses(classes, targetDateStr) {
             const container = document.getElementById('scheduleContainer');
-            if (classes.length === 0) {
-                showEmptyState(TRANSLATIONS[currentLang].emptyTitle, [TRANSLATIONS[currentLang].emptyDesc], '<i class="fas fa-calendar-check"></i>');
-                return;
-            }
-            container.classList.remove('hidden');
             const t = TRANSLATIONS[currentLang];
             
             classes.forEach((cls, index) => {
@@ -657,66 +874,61 @@
                 const isLast = index === classes.length - 1;
                 const card = document.createElement('div');
                 
-                // --- Structure Strategy ---
-                // Mobile: Flex Row [Time] [Axis] [Content]
-                // Desktop: Grid [Time] [Axis] [Content]
-                
-                card.className = `relative card-enter ${isLast ? 'last-item' : ''} mb-0`; // Removed mb-4 to tighten timeline
+                card.className = `relative card-enter ${isLast ? 'last-item' : ''} mb-0`;
                 card.style.animationDelay = `${index * 0.05}s`;
                 
-                let circleClass = "bg-white border-2 border-slate-200";
-                let iconClass = "text-slate-300";
+                let circleClass = "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600";
+                let iconClass = "text-slate-300 dark:text-slate-500";
                 let icon = "fa-clock";
-                let cardBg = "bg-white border-slate-100 shadow-sm hover:border-blue-200";
-                let timeColor = "text-slate-400"; // Default time color
+                let cardBg = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm hover:border-blue-200 dark:hover:border-blue-700";
+                let timeColor = "text-slate-400 dark:text-slate-500"; 
 
                 // Badges & Colors
-                let timeBadgeClass = "text-slate-500 bg-slate-100";
+                let timeBadgeClass = "text-slate-500 bg-slate-100"; // Fallback for mobile badge if needed
                 
                 if (isNow) {
-                    circleClass = "bg-blue-600 ring-4 ring-blue-100 scale-110 shadow-lg shadow-blue-200/50"; 
+                    circleClass = "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900 scale-110 shadow-lg shadow-blue-200/50 dark:shadow-none"; 
                     iconClass = "text-white"; 
-                    cardBg = "glow-border shadow-lg transform md:scale-[1.02] border-blue-200";
-                    timeBadgeClass = "text-blue-700 bg-blue-100";
-                    timeColor = "text-blue-600 font-extrabold scale-110 origin-right transition-transform";
+                    cardBg = "glow-border shadow-lg transform md:scale-[1.02] border-blue-200 dark:border-blue-800";
+                    timeColor = "text-blue-600 dark:text-blue-400 font-extrabold scale-110 origin-right transition-transform";
                 } else if (isLunch) {
-                    circleClass = "bg-amber-100 border-2 border-amber-200"; iconClass = "text-amber-500"; icon = "fa-utensils"; 
-                    cardBg = "bg-amber-50/50 border-amber-100 border-dashed";
-                    timeBadgeClass = "text-amber-600 bg-amber-100";
+                    circleClass = "bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800"; 
+                    iconClass = "text-amber-500 dark:text-amber-400"; icon = "fa-utensils"; 
+                    cardBg = "bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed";
                 } else if (isFreelance) {
-                    circleClass = "bg-slate-100 border-2 border-slate-300"; iconClass = "text-slate-400"; icon = "fa-book-reader"; 
-                    cardBg = "bg-slate-50 border-slate-200 border-dashed opacity-80";
-                    timeBadgeClass = "text-slate-500 bg-slate-200";
+                    circleClass = "bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600"; 
+                    iconClass = "text-slate-400 dark:text-slate-500"; icon = "fa-book-reader"; 
+                    cardBg = "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 border-dashed opacity-80";
                 } else if (cls.isLab) {
-                    circleClass = "bg-rose-100 border-2 border-rose-200"; iconClass = "text-rose-500"; icon = "fa-flask"; 
-                    cardBg = "bg-rose-50/50 border-rose-200 shadow-md border-l-4 border-l-rose-500";
-                    timeBadgeClass = "text-rose-600 bg-rose-100";
+                    circleClass = "bg-rose-100 dark:bg-rose-900/30 border-2 border-rose-200 dark:border-rose-800"; 
+                    iconClass = "text-rose-500 dark:text-rose-400"; icon = "fa-flask"; 
+                    cardBg = "bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-900/30 shadow-md border-l-4 border-l-rose-500 dark:border-l-rose-600";
                 } else if (cls.isClinical) {
-                    circleClass = "bg-violet-100 border-2 border-violet-200"; iconClass = "text-violet-500"; icon = "fa-stethoscope"; 
-                    cardBg = "bg-violet-50/50 border-violet-200 shadow-md border-l-4 border-l-violet-500";
-                    timeBadgeClass = "text-violet-600 bg-violet-100";
+                    circleClass = "bg-violet-100 dark:bg-violet-900/30 border-2 border-violet-200 dark:border-violet-800"; 
+                    iconClass = "text-violet-500 dark:text-violet-400"; icon = "fa-stethoscope"; 
+                    cardBg = "bg-violet-50/50 dark:bg-violet-900/10 border-violet-200 dark:border-violet-900/30 shadow-md border-l-4 border-l-violet-500 dark:border-l-violet-600";
                 }
                 
                 let linesHtml = '';
                 cls.lines.forEach((line, idx) => {
-                    if (isLunch) linesHtml += `<div class="font-bold text-amber-700/80 text-base leading-tight italic">${line}</div>`;
-                    else if (isFreelance) linesHtml += `<div class="font-medium text-slate-500 italic text-base">${line}</div>`;
+                    if (isLunch) linesHtml += `<div class="font-bold text-amber-700/80 dark:text-amber-500 text-base leading-tight italic">${line}</div>`;
+                    else if (isFreelance) linesHtml += `<div class="font-medium text-slate-500 dark:text-slate-400 italic text-base">${line}</div>`;
                     else {
-                        if (idx === 0) linesHtml += `<div class="font-bold text-slate-800 text-lg leading-tight mb-1">${line}</div>`;
-                        else if (idx === 1) linesHtml += `<div class="font-medium text-slate-600 text-sm leading-snug mb-2">${line}</div>`;
-                        else linesHtml += `<div class="flex items-center gap-2 text-slate-400 text-xs mt-1"><i class="fas fa-user-circle"></i><span>${line}</span></div>`;
+                        if (idx === 0) linesHtml += `<div class="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight mb-1">${line}</div>`;
+                        else if (idx === 1) linesHtml += `<div class="font-medium text-slate-600 dark:text-slate-400 text-sm leading-snug mb-2">${line}</div>`;
+                        else linesHtml += `<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs mt-1"><i class="fas fa-user-circle"></i><span>${line}</span></div>`;
                     }
                 });
 
                 let badgeHtml = '';
-                if (cls.isLab) badgeHtml = `<span class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-200 ml-2">${t.badgeLab}</span>`;
-                else if (cls.isClinical) badgeHtml = `<span class="bg-violet-100 text-violet-600 text-[10px] font-bold px-2 py-0.5 rounded border border-violet-200 ml-2">${t.badgeClinical}</span>`;
-                if (isNow) badgeHtml += `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse shadow-sm shadow-blue-200 ml-2">${t.now}</span>`;
+                if (cls.isLab) badgeHtml = `<span class="bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 ml-2">${t.badgeLab}</span>`;
+                else if (cls.isClinical) badgeHtml = `<span class="bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-bold px-2 py-0.5 rounded border border-violet-200 dark:border-violet-800 ml-2">${t.badgeClinical}</span>`;
+                if (isNow) badgeHtml += `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse shadow-sm shadow-blue-200 dark:shadow-none ml-2">${t.now}</span>`;
 
                 card.innerHTML = `
                     <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
                         
-                        <!-- Time Column (Separate on Mobile & Desktop) -->
+                        <!-- Time Column -->
                         <div class="flex flex-col items-end pt-4 pr-3 w-14 shrink-0 md:w-auto md:pt-6 md:pr-2">
                             <span class="text-xs md:text-xl ${timeColor} font-bold tracking-tight font-mono">${cls.time}</span>
                         </div>
@@ -739,7 +951,6 @@
                                 <!-- Card Header -->
                                 <div class="flex justify-between items-center ${badgeHtml ? 'mb-2' : ''} md:mb-1">
                                     <div class="flex items-center">
-                                        <!-- Note: Time removed from here as it is now on the left -->
                                         ${badgeHtml}
                                     </div>
                                 </div>
