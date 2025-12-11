@@ -393,6 +393,13 @@
             const icon = document.getElementById('darkModeIcon');
             if(icon) icon.className = isDark ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-xs';
         }
+        
+        // RE-ADDED MISSING FUNCTION
+        window.toggleLanguage = function() {
+            if (navigator.vibrate) navigator.vibrate(5);
+            const newLang = currentLang === 'EN' ? 'TR' : 'EN';
+            setLanguage(newLang);
+        }
 
         function toggleViewMode() {
             if (viewMode === 'search') { viewMode = 'day'; toggleSearch(); return; }
