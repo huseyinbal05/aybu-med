@@ -471,10 +471,6 @@
             const isEnglish = currentLang === 'EN';
             const splitColumn = 8;
             
-            // Scan whole sheet for dates
-            // A smarter approach than iterating all cells:
-            // Iterate all rows, finding rows that look like dates in the relevant columns
-            
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
@@ -485,10 +481,8 @@
 
                     const dateStr = normalizeDate(row[c]);
                     if (dateStr) {
-                        // Found a date header! Now extract classes for this day.
-                        // We duplicate getClasses logic here, or refactor getClasses to accept row/col.
-                        // Refactoring is cleaner. Let's use a helper.
-                        const classes = extractClassesForColumn(r, c);
+                        // Exclude 'lunch' type items from search index to avoid clutter
+                        const classes = extractClassesForColumn(r, c).filter(c => c.type !== 'lunch');
                         if (classes.length > 0) {
                             searchIndex.push({ date: dateStr, items: classes });
                         }
@@ -565,10 +559,14 @@
                         const isFreelance = joinedLower.includes("freelance") || joinedLower.includes("bireysel");
                         const isLunchText = joinedLower.includes("lunch") || joinedLower.includes("öğle arası");
                         
-                        // We skip pure lunch/breaks in search index to keep it clean, unless text matches query later
-                        if (!isLunchText) {
+                        if (isLunchText) {
+                             classes.push({ time: timeSlot, lines: [TRANSLATIONS[currentLang].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
+                        } else {
                              classes.push({ time: timeSlot, lines: contentLines, raw: rawJoined, isLab, isClinical, type: isFreelance ? 'freelance' : 'normal' });
                         }
+                    } else if (isLunchTime) {
+                        // Add default lunch if empty at lunch time
+                        classes.push({ time: timeSlot, lines: [TRANSLATIONS[currentLang].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
                     }
                 }
                 r++;
@@ -1028,12 +1026,11 @@
                     col.innerHTML += `<div class="text-center text-slate-300 dark:text-slate-600 text-xs py-10 font-bold uppercase tracking-wider">Empty</div>`;
                 } else {
                     classes.forEach(cls => {
-                        if(cls.type === 'lunch') return; // Skip lunch in week view to save space
-                        
                         let cardClass = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700";
                         if(cls.isLab) cardClass = "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/50";
                         else if(cls.isClinical) cardClass = "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/50";
                         else if(cls.type === 'freelance') cardClass = "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60";
+                        else if(cls.type === 'lunch') cardClass = "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed opacity-80";
 
                         col.innerHTML += `
                             <div class="p-3 rounded-xl border ${cardClass} shadow-sm text-sm">
