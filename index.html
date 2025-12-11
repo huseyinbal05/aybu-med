@@ -309,7 +309,7 @@
         const NEW_YEAR_MESSAGES = { EN: ["Happy New Year! 🎉"], TR: ["Mutlu Yıllar! 🎉"] };
         const EID_MESSAGES = { EN: ["Eid Mubarak! 🍬"], TR: ["İyi Bayramlar! 🍬"] };
 
-        const HOLIDAY_KEYWORDS = ["holiday", "tatil", "sömestr", "semester", "yarıyıl", "break", "resmi"];
+        const HOLIDAY_KEYWORDS = ["holiday", "tatil", "sömestr", "semester", "yarıyıl", "break", "resmi", "ara tatil", "ulusal", "cumhuriyet", "zafer", "emek", "demokrasi"];
         const NEW_YEAR_KEYWORDS = ["yılbaşı", "yilbasi", "new year", "noel", "happy new year", "yeni yıl", "yeniyıl", "yeni yil"];
         const EID_KEYWORDS = ["ramazan", "ramadan", "eid", "bayram", "kurban", "seker", "şeker"];
         const CLINICAL_KEYWORDS = ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"];
@@ -555,7 +555,7 @@
 
                     if (contentLines.length > 0) {
                         const rawJoined = contentLines.join(" ");
-                        const joinedLower = rawJoined.toLowerCase();
+                        const joinedLower = rawJoined.toLocaleLowerCase('tr-TR');
                         
                         // Basic Types
                         let isLab = rawJoined.toUpperCase().includes("LAB") && !joinedLower.includes("inkılab") && !joinedLower.includes("history");
@@ -894,16 +894,23 @@
                      return true; 
                 }
                 if (typeof val === 'string') {
-                    const s = val.toLowerCase().trim();
-                    if (s.includes("committee chairman")) return true;
-                    if (s.includes("komite sorumluları")) return true;
+                    const s = val.toLocaleLowerCase('tr-TR').trim();
+                    
+                    // Headers & Titles
+                    if (s.includes("committee")) return true;
+                    if (s.includes("komite")) return true;
+                    if (s.startsWith("dönem") || s.startsWith("phase")) return true;
+                    
+                    // Week / Hafta Markers
                     if (s.match(/^week\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*week$/)) return true;
-                    if (s === 'week') return true; // Added: standalone "week"
+                    if (s === 'week') return true; 
+                    
+                    // Turkish Week Patterns
                     if (s.match(/^hafta\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*hafta$/)) return true;
-                    if (s.match(/^\d+\.\s*hafta$/)) return true;
-                    if (s === 'hafta') return true; // Added: standalone "hafta"
+                    if (s.match(/^\d+\.\s*hafta$/)) return true; // e.g. "1. Hafta"
+                    if (s === 'hafta') return true; 
                 }
             }
             return false;
@@ -914,8 +921,13 @@
             const s = String(val).trim();
             if (s.includes("GMT")) return true;
             if (s.startsWith("(Thu") || s.startsWith("(Mon") || s.startsWith("(Tue") || s.startsWith("(Wed") || s.startsWith("(Fri")) return true;
-            if (s.match(/^\d+$/)) return true; 
-            if (s.toLowerCase() === 'week' || s.toLowerCase() === 'hafta') return true; // Added safety check
+            if (s.match(/^\d+$/)) return true; // Pure numbers
+            
+            // Explicit ignore list
+            const lower = s.toLocaleLowerCase('tr-TR');
+            if (lower === 'week' || lower === 'hafta') return true;
+            if (lower.startsWith('komite') || lower.startsWith('committee')) return true;
+            
             return false;
         }
 
