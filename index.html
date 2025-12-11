@@ -910,12 +910,17 @@
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
                     
-                    // Headers & Titles
-                    if (s.includes("committee")) return true;
-                    if (s.includes("komite")) return true;
-                    if (s.startsWith("dönem") || s.startsWith("phase")) return true;
+                    // Headers & Titles (Stricter Checks)
+                    // Matches "Committee 1", "Komite 2", "Committee I", etc.
+                    if (s.match(/^committee\s*[\dIVX]+$/i)) return true;
+                    if (s.match(/^komite\s*[\dIVX]+$/i)) return true;
+                    if (s === 'committee' || s === 'komite') return true;
+
+                    // Matches "Phase 1", "Dönem 1" strictly
+                    if (s.match(/^phase\s*[\dIVX]+$/i)) return true;
+                    if (s.match(/^dönem\s*[\dIVX]+$/i)) return true;
                     
-                    // Week / Hafta Markers
+                    // Week / Hafta Markers (Keep strict)
                     if (s.match(/^week\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*week$/)) return true;
                     if (s === 'week') return true; 
