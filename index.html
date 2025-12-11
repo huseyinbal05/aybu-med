@@ -40,7 +40,6 @@
     <style>
         body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         
-        /* Complex gradient animation that is hard to do purely in Tailwind utilities */
         .glow-border { position: relative; z-index: 1; transition: transform 0.3s ease; }
         .glow-border::before {
             content: ""; position: absolute; inset: -2px; border-radius: 20px;
@@ -49,7 +48,6 @@
         }
         @keyframes gradientMove { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
 
-        /* Timeline Connector Logic - Position specific */
         .time-connector { position: absolute; z-index: 0; }
         .mobile-connector { left: 23px; top: 45px; bottom: -20px; width: 2px; }
         .desktop-connector { display: none; }
@@ -61,11 +59,9 @@
         .btn-press { transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); touch-action: manipulation; }
         .btn-press:active { transform: scale(0.92); }
 
-        /* Search Container Animation */
         #searchContainer { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 0; overflow: hidden; opacity: 0; }
         #searchContainer.open { max-height: 80px; opacity: 1; margin-top: 0.5rem; }
     </style>
-    <!-- Early Theme Script -->
     <script>
         (function() {
             const savedTheme = localStorage.getItem('aybu_theme_v1');
@@ -169,102 +165,129 @@
     </header>
 
     <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
-
-        <!-- Schedule Container (Day View) -->
         <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0"></div>
-
-        <!-- Week View Container -->
         <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 md:grid-cols-5 gap-4"></div>
-
-        <!-- Search Results Container -->
         <div id="searchResultsContainer" class="hidden mt-4 space-y-4"></div>
 
-        <!-- Empty State / Error State -->
         <div id="emptyState" class="hidden text-center py-24 px-6 animate-fade-in-up">
             <div id="emptyIcon" class="text-6xl text-slate-200 dark:text-slate-700 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
             <h3 id="txt-empty-title" class="text-2xl font-bold text-slate-700 dark:text-slate-300">No Classes Found</h3>
             <p id="txt-empty-desc" class="text-slate-400 dark:text-slate-500 text-base max-w-[280px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
         </div>
 
-        <!-- No Search Results -->
         <div id="noSearchResults" class="hidden text-center py-16 px-6 animate-fade-in-up">
              <div class="text-4xl text-slate-200 dark:text-slate-700 mb-4 inline-block"><i class="fas fa-search"></i></div>
              <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">No matching classes</h3>
              <p class="text-slate-400 dark:text-slate-500 text-sm">Try searching for a subject name or room.</p>
         </div>
 
-        <!-- Skeleton Loading State -->
         <div id="loadingState" class="hidden w-full max-w-3xl mx-auto mt-8 px-2">
-            <!-- Skeleton Items -->
             <div class="space-y-8 animate-pulse">
-                <!-- Skeleton Item 1 -->
-                <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
-                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
-                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div>
-                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
-                </div>
-                 <!-- Skeleton Item 2 -->
-                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
-                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
-                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div>
-                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
-                </div>
-                 <!-- Skeleton Item 3 -->
-                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
-                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
-                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div></div>
-                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
-                </div>
+                <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2"><div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div><div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div><div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div></div>
+                <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2"><div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div><div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div><div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div></div>
+                <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2"><div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div><div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div></div><div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div></div>
             </div>
             <p id="txt-loading" class="text-center text-slate-400 dark:text-slate-500 text-xs mt-8 font-bold tracking-widest uppercase">Loading Schedule...</p>
         </div>
-
     </main>
     
-    <!-- Install Modal -->
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700">
             <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
             <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App</h3>
             <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
                 <div class="text-3xl text-slate-800 dark:text-slate-200"><i class="fab fa-apple"></i></div>
-                <div>
-                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">iOS (Safari)</h4>
-                    <p id="txt-install-ios" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p>
-                </div>
+                <div><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">iOS (Safari)</h4><p id="txt-install-ios" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p></div>
             </div>
             <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-green-100 transition-colors">
                 <div class="text-3xl text-green-500"><i class="fab fa-android"></i></div>
-                <div>
-                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">Android (Chrome)</h4>
-                    <p id="txt-install-android" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Menu <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Install App'</p>
-                </div>
+                <div><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">Android (Chrome)</h4><p id="txt-install-android" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Menu <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Install App'</p></div>
             </div>
             <button onclick="closeInstallModal()" class="mt-6 w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-all shadow-lg" id="txt-install-close">Got it</button>
         </div>
     </div>
 
-    <!-- Go To Today Button -->
     <button id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
         <i class="fas fa-calendar-day text-xl group-hover:scale-110 transition-transform"></i>
     </button>
 
     <script>
-        // CONFIGURATION & MAGIC NUMBERS
+        // --- 1. CONFIGURATION ---
         const CONFIG = {
             SCHEDULE_FILENAME: 'schedule.xlsx',
-            SPLIT_COLUMN_INDEX: 8, // Column index dividing TR and EN sections
-            STORAGE_KEYS: {
-                DATA: 'aybu_data_v48',
-                LANG: 'aybu_lang_v48',
-                THEME: 'aybu_theme_v1'
+            SPLIT_COLUMN_INDEX: 8, 
+            STORAGE_KEYS: { DATA: 'aybu_data_v48', LANG: 'aybu_lang_v48', THEME: 'aybu_theme_v1' }
+        };
+
+        const CONSTANTS = {
+            HOLIDAYS: ["holiday", "tatil", "sömestr", "semester", "yarıyıl", "break", "resmi", "ara tatil", "ulusal", "cumhuriyet", "zafer", "emek", "demokrasi"],
+            NEW_YEAR: ["yılbaşı", "yilbasi", "new year", "noel", "happy new year", "yeni yıl", "yeniyıl", "yeni yil"],
+            EID: ["ramazan", "ramadan", "eid", "bayram", "kurban", "seker", "şeker"],
+            CLINICAL: ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"],
+            LAB_EXCLUDES: ["inkılab", "history"]
+        };
+
+        // --- 2. UTILITIES ---
+        const DateUtils = {
+            // Standardizes Excel date (potentially offset) to YYYY-MM-DD string
+            // Excel dates are often local, but sheetjs gives Date objects. 
+            // We use a safe offset to prevent timezone shifts (e.g., 23:00 previous day).
+            normalize: (cellVal) => {
+                if (!cellVal) return null;
+                if (cellVal instanceof Date) {
+                    // Safe shift to ensure we are in the middle of the day to avoid edge case timezone flips
+                    const safeDate = new Date(cellVal.getTime() + (12 * 60 * 60 * 1000));
+                    return `${safeDate.getUTCFullYear()}-${String(safeDate.getUTCMonth() + 1).padStart(2, '0')}-${String(safeDate.getUTCDate()).padStart(2, '0')}`;
+                }
+                if (typeof cellVal === 'string') {
+                    const s = cellVal.trim();
+                    if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s; 
+                    if (s.match(/^\d{4}-\d{2}-\d{2}T/)) return s.split('T')[0]; 
+                }
+                return null;
+            },
+            
+            // Returns a safe Date object from YYYY-MM-DD
+            parse: (dateStr) => {
+                if (!dateStr) return null;
+                const parts = dateStr.split('-');
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            },
+
+            getTodayString: () => {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
             }
         };
 
+        const ClassTypeDetector = {
+            detect: (rawText) => {
+                const joinedLower = rawText.toLocaleLowerCase('tr-TR');
+                
+                let isLab = rawText.toUpperCase().includes("LAB") && !CONSTANTS.LAB_EXCLUDES.some(ex => joinedLower.includes(ex));
+                const isClinical = CONSTANTS.CLINICAL.some(kw => joinedLower.includes(kw));
+                const isFreelance = joinedLower.includes("freelance") || joinedLower.includes("bireysel");
+                const isLunchText = joinedLower.includes("lunch") || joinedLower.includes("öğle arası");
+                
+                let type = 'normal';
+                if (CONSTANTS.NEW_YEAR.some(kw => joinedLower.includes(kw))) type = 'new_year_item';
+                else if (CONSTANTS.EID.some(kw => joinedLower.includes(kw))) type = 'eid_item';
+                else if (CONSTANTS.HOLIDAYS.some(kw => joinedLower.includes(kw))) type = 'holiday_item';
+                else if (isLunchText) type = 'lunch';
+                else if (isFreelance) type = 'freelance';
+
+                return { type, isLab, isClinical };
+            }
+        };
+
+        // --- 3. STATE ---
         let workbookData = null;
-        let searchIndex = []; 
+        let searchIndexes = { EN: [], TR: [] }; // Optimized dual index
         let currentLang = 'EN';
-        let viewMode = 'day'; // 'day', 'week', 'search'
+        let viewMode = 'day'; 
 
         const TRANSLATIONS = {
             EN: {
@@ -295,101 +318,75 @@
             }
         };
 
-        const WEEKEND_MESSAGES = { EN: ["It's the weekend! Time to recharge 🔋", "No classes today. Go touch some grass 🌱"], TR: ["Hafta sonu geldi! Şarj olma zamanı 🔋", "Bugün ders yok. Çimlere basma vakti 🌱"] };
-        const FREELANCE_MESSAGES = { EN: ["Focus mode: ON. You got this! 💡", "Library day? Or coffee shop? ☕"], TR: ["Odaklanma modu: AÇIK. Yapabilirsin! 💡", "Kütüphane mi, kafe mi? ☕"] };
-        const HOLIDAY_MESSAGES = { EN: ["Enjoy your holidays! ✈️"], TR: ["Tatilin tadını çıkar! ✈️"] };
-        const NEW_YEAR_MESSAGES = { EN: ["Happy New Year! 🎉"], TR: ["Mutlu Yıllar! 🎉"] };
-        const EID_MESSAGES = { EN: ["Eid Mubarak! 🍬"], TR: ["İyi Bayramlar! 🍬"] };
+        const MESSAGES = {
+            WEEKEND: { EN: ["It's the weekend! Time to recharge 🔋", "No classes today. Go touch some grass 🌱"], TR: ["Hafta sonu geldi! Şarj olma zamanı 🔋", "Bugün ders yok. Çimlere basma vakti 🌱"] },
+            FREELANCE: { EN: ["Focus mode: ON. You got this! 💡", "Library day? Or coffee shop? ☕"], TR: ["Odaklanma modu: AÇIK. Yapabilirsin! 💡", "Kütüphane mi, kafe mi? ☕"] },
+            HOLIDAY: { EN: ["Enjoy your holidays! ✈️"], TR: ["Tatilin tadını çıkar! ✈️"] },
+            NEW_YEAR: { EN: ["Happy New Year! 🎉"], TR: ["Mutlu Yıllar! 🎉"] },
+            EID: { EN: ["Eid Mubarak! 🍬"], TR: ["İyi Bayramlar! 🍬"] }
+        };
 
-        const HOLIDAY_KEYWORDS = ["holiday", "tatil", "sömestr", "semester", "yarıyıl", "break", "resmi", "ara tatil", "ulusal", "cumhuriyet", "zafer", "emek", "demokrasi"];
-        const NEW_YEAR_KEYWORDS = ["yılbaşı", "yilbasi", "new year", "noel", "happy new year", "yeni yıl", "yeniyıl", "yeni yil"];
-        const EID_KEYWORDS = ["ramazan", "ramadan", "eid", "bayram", "kurban", "seker", "şeker"];
-        const CLINICAL_KEYWORDS = ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"];
+        // --- 4. APP LOGIC ---
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Theme Init & System Listener
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            initTheme();
+            initLang();
+            initDate();
             
-            function applyTheme() {
-                const savedTheme = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
-                const systemDark = mediaQuery.matches;
-                let isDark = false;
-                
-                if (savedTheme === 'dark') isDark = true;
-                else if (savedTheme === 'light') isDark = false;
-                else isDark = systemDark; 
-                
-                if (isDark) {
-                    document.documentElement.classList.add('dark');
-                    updateThemeIcon(true);
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    updateThemeIcon(false);
-                }
-            }
-
-            // Apply on load
-            applyTheme();
-
-            mediaQuery.addEventListener('change', () => {
-                if (!localStorage.getItem(CONFIG.STORAGE_KEYS.THEME)) {
-                    applyTheme();
-                }
-            });
-
-            // Lang Init
-            const savedLang = localStorage.getItem(CONFIG.STORAGE_KEYS.LANG);
-            if (savedLang) setLanguage(savedLang, false);
-            else setLanguage('EN', false);
-
-            const now = new Date();
-            document.getElementById('datePicker').value = getLocalDateString(now);
-            updateDateDisplay(now);
-            updateDayProgress();
-
-            document.getElementById('datePicker').addEventListener('change', (e) => {
-                const parts = e.target.value.split('-');
-                const d = new Date(parts[0], parts[1] - 1, parts[2]); 
-                updateDateDisplay(d);
-                if (document.getElementById('searchContainer').classList.contains('open')) {
-                   toggleSearch();
-                } else {
-                   refreshView();
-                }
-            });
+            // Service Worker Register Placeholder
+            /* if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
+            } */
 
             setInterval(updateDayProgress, 60000); 
             initApp();
             
+            checkInstallBanner();
+        });
+
+        function initTheme() {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const apply = () => {
+                const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
+                const isDark = saved === 'dark' || (!saved && mediaQuery.matches);
+                document.documentElement.classList.toggle('dark', isDark);
+                updateThemeIcon(isDark);
+            };
+            apply();
+            mediaQuery.addEventListener('change', () => !localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) && apply());
+        }
+
+        function initLang() {
+            const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.LANG);
+            setLanguage(saved || 'EN', false);
+        }
+
+        function initDate() {
+            const now = new Date();
+            document.getElementById('datePicker').value = DateUtils.getTodayString();
+            updateDateDisplay(now);
+            updateDayProgress();
+            
+            document.getElementById('datePicker').addEventListener('change', (e) => {
+                const d = DateUtils.parse(e.target.value);
+                updateDateDisplay(d);
+                document.getElementById('searchContainer').classList.contains('open') ? toggleSearch() : refreshView();
+            });
+        }
+
+        function checkInstallBanner() {
             if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('installBannerDismissed')) {
                 const banner = document.getElementById('installBanner');
                 banner.classList.remove('hidden');
-                // Auto-hide after 10 seconds
-                setTimeout(() => {
-                    banner.classList.add('hidden');
-                }, 10000);
+                setTimeout(() => banner.classList.add('hidden'), 10000);
             }
-        });
+        }
 
-        // --- CORE FUNCTIONS ---
         function toggleDarkMode() {
-            const current = document.documentElement.classList.contains('dark');
-            const next = !current;
-            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (next) {
-                document.documentElement.classList.add('dark');
-                updateThemeIcon(true);
-            } else {
-                document.documentElement.classList.remove('dark');
-                updateThemeIcon(false);
-            }
-            
-            if (next === systemDark) {
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.THEME);
-            } else {
-                localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, next ? 'dark' : 'light');
-            }
+            const isDark = !document.documentElement.classList.contains('dark');
+            document.documentElement.classList.toggle('dark', isDark);
+            updateThemeIcon(isDark);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, isDark ? 'dark' : 'light');
         }
 
         function updateThemeIcon(isDark) {
@@ -398,14 +395,9 @@
         }
 
         function toggleViewMode() {
-            if (viewMode === 'search') {
-                viewMode = 'day';
-                toggleSearch(); 
-                return;
-            }
+            if (viewMode === 'search') { viewMode = 'day'; toggleSearch(); return; }
             viewMode = viewMode === 'day' ? 'week' : 'day';
-            const btn = document.getElementById('viewToggleBtn');
-            btn.querySelector('i').className = viewMode === 'day' ? 'fas fa-columns text-xs' : 'fas fa-calendar-day text-xs';
+            document.getElementById('viewToggleBtn').querySelector('i').className = viewMode === 'day' ? 'fas fa-columns text-xs' : 'fas fa-calendar-day text-xs';
             refreshView();
         }
 
@@ -430,10 +422,6 @@
             }
         }
 
-        function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
-        function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
-        function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
-        
         function toggleSearch() {
             const container = document.getElementById('searchContainer');
             const input = document.getElementById('searchInput');
@@ -458,37 +446,38 @@
             }
         }
 
-        // --- GLOBAL SEARCH ENGINE ---
-        
-        function buildSearchIndex() {
+        // --- 5. DATA ENGINE ---
+
+        // Optimized Builder: Builds both languages at once
+        function buildSearchIndexes() {
             if (!workbookData) return;
-            searchIndex = [];
-            const isEnglish = currentLang === 'EN';
+            searchIndexes = { EN: [], TR: [] };
             
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
-                    
-                    if (isEnglish && c <= CONFIG.SPLIT_COLUMN_INDEX) continue;
-                    if (!isEnglish && c > CONFIG.SPLIT_COLUMN_INDEX) continue;
-
-                    const dateStr = normalizeDate(row[c]);
+                    const dateStr = DateUtils.normalize(row[c]);
                     if (dateStr) {
-                        const classes = extractClassesForColumn(r, c).filter(c => c.type !== 'lunch');
+                        const langKey = c <= CONFIG.SPLIT_COLUMN_INDEX ? 'TR' : 'EN';
+                        // Reuse the extraction logic, but we need to trick it into thinking currentLang is correct
+                        // Or better, pass explicit column check. 
+                        // Simplified: Extract classes for this column.
+                        const classes = extractClassesForColumn(r, c, langKey).filter(c => c.type !== 'lunch');
                         if (classes.length > 0) {
-                            searchIndex.push({ date: dateStr, items: classes });
+                            searchIndexes[langKey].push({ date: dateStr, items: classes });
                         }
                     }
                 }
             }
         }
 
-        function extractClassesForColumn(dateRowIndex, targetColIndex) {
+        // Refactored Extraction Logic
+        function extractClassesForColumn(dateRowIndex, targetColIndex, langOverride = null) {
             const classes = [];
-            const isEnglish = currentLang === 'EN';
+            const isEnglish = langOverride ? (langOverride === 'EN') : (currentLang === 'EN');
             let timeColIndex = -1;
 
-            // Find time column relative to this date
+            // 1. Locate Time Column
             for(let offset = 1; offset <= 4; offset++) {
                 const checkRow = workbookData[dateRowIndex + offset];
                 if(checkRow) {
@@ -501,6 +490,7 @@
             }
             if (timeColIndex === -1) timeColIndex = isEnglish ? 9 : 0; 
 
+            // 2. Scan Rows below Date
             let r = dateRowIndex + 1;
             const maxRows = Math.min(workbookData.length, dateRowIndex + 60); 
 
@@ -523,7 +513,7 @@
                         if(s.length > 2) contentLines.push(s);
                     }
                     
-                    // Multi-row merge
+                    // 3. Handle Merged Rows (Lookahead)
                     let subR = r + 1;
                     while (subR < maxRows) {
                         const subRow = workbookData[subR];
@@ -540,67 +530,37 @@
                     }
                     r = subR - 1;
 
+                    // 4. Classify & Add
                     if (contentLines.length > 0) {
                         const rawJoined = contentLines.join(" ");
-                        const joinedLower = rawJoined.toLocaleLowerCase('tr-TR');
+                        const { type, isLab, isClinical } = ClassTypeDetector.detect(rawJoined);
                         
-                        let isLab = rawJoined.toUpperCase().includes("LAB") && !joinedLower.includes("inkılab") && !joinedLower.includes("history");
-                        const isClinical = CLINICAL_KEYWORDS.some(kw => joinedLower.includes(kw));
-                        const isFreelance = joinedLower.includes("freelance") || joinedLower.includes("bireysel");
-                        const isLunchText = joinedLower.includes("lunch") || joinedLower.includes("öğle arası");
+                        // Override type if content suggests lunch explicitly
+                        const finalType = type === 'lunch' ? 'lunch' : type;
                         
-                        const isNewYear = NEW_YEAR_KEYWORDS.some(kw => joinedLower.includes(kw));
-                        const isEid = EID_KEYWORDS.some(kw => joinedLower.includes(kw));
-                        const isHoliday = HOLIDAY_KEYWORDS.some(kw => joinedLower.includes(kw));
-                        
-                        let type = 'normal';
-                        if (isNewYear) type = 'new_year_item';
-                        else if (isEid) type = 'eid_item';
-                        else if (isHoliday) type = 'holiday_item';
-                        else if (isLunchText) type = 'lunch';
-                        else if (isFreelance) type = 'freelance';
-
-                        if (type === 'lunch') {
-                             classes.push({ time: timeSlot, lines: [TRANSLATIONS[currentLang].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
-                        } else {
-                             classes.push({ time: timeSlot, lines: contentLines, raw: rawJoined, isLab, isClinical, type: type });
-                        }
+                        classes.push({ 
+                            time: timeSlot, 
+                            lines: finalType === 'lunch' ? [TRANSLATIONS[isEnglish ? 'EN' : 'TR'].lunch] : contentLines, 
+                            raw: rawJoined, 
+                            isLab, 
+                            isClinical, 
+                            type: finalType 
+                        });
                     } else if (isLunchTime) {
-                        classes.push({ time: timeSlot, lines: [TRANSLATIONS[currentLang].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
+                        classes.push({ time: timeSlot, lines: [TRANSLATIONS[isEnglish ? 'EN' : 'TR'].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
                     }
                 }
                 r++;
             }
             
-            const uniqueClasses = [];
-            let lunchAdded = false;
-            for (const cls of classes) {
-                if (cls.type === 'lunch') {
-                    if (!lunchAdded) {
-                        uniqueClasses.push(cls);
-                        lunchAdded = true;
-                    }
-                } else {
-                    uniqueClasses.push(cls);
-                }
-            }
-            return uniqueClasses;
+            // Deduplicate Lunches
+            return classes.filter((cls, index, self) => 
+                cls.type !== 'lunch' || index === self.findIndex((t) => t.type === 'lunch')
+            );
         }
 
-        // Highlight Helper
-        function highlightMatch(text, term) {
-            if (!term) return text;
-            try {
-                // Escape regex characters to prevent errors
-                const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escapedTerm})`, 'gi');
-                return text.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-900/60 text-slate-900 dark:text-yellow-100 rounded px-0.5 box-decoration-clone">$1</span>');
-            } catch(e) {
-                return text; 
-            }
-        }
+        // --- 6. SEARCH & RENDERING ---
 
-        // 2. Handle Input (Debounced)
         let debounceTimer;
         function handleGlobalSearch(query) {
             clearTimeout(debounceTimer);
@@ -620,16 +580,14 @@
                 container.innerHTML = '';
                 
                 let count = 0;
-                const maxResults = 50; 
-                
-                // PERFORMANCE: Use DocumentFragment
                 const fragment = document.createDocumentFragment();
+                // Use the pre-built index for CURRENT language
+                const currentIndex = searchIndexes[currentLang];
 
-                for (const day of searchIndex) {
+                for (const day of currentIndex) {
                     const matches = day.items.filter(item => item.raw.toLowerCase().includes(term));
                     if (matches.length > 0) {
-                        // Render Date Header
-                        const dateObj = new Date(day.date);
+                        const dateObj = DateUtils.parse(day.date);
                         const dateHeader = document.createElement('div');
                         dateHeader.className = "flex items-center gap-2 mt-6 mb-2 px-2";
                         dateHeader.innerHTML = `
@@ -639,7 +597,6 @@
                         `;
                         fragment.appendChild(dateHeader);
 
-                        // Render Items
                         matches.forEach(item => {
                             const card = document.createElement('div');
                             card.className = "bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-[0.98]";
@@ -649,7 +606,6 @@
                             if(item.isLab) highlightClass = "text-rose-600 dark:text-rose-400";
                             if(item.isClinical) highlightClass = "text-violet-600 dark:text-violet-400";
 
-                            // Apply Highlight
                             const line0 = highlightMatch(item.lines[0], term);
                             const line1 = item.lines.length > 1 ? highlightMatch(item.lines[1], term) : '';
 
@@ -666,144 +622,58 @@
                             count++;
                         });
                     }
-                    if (count >= maxResults) break; 
+                    if (count >= 50) break; 
                 }
 
                 container.appendChild(fragment);
-
-                if (count === 0) {
-                    noRes.classList.remove('hidden');
-                } else {
-                    noRes.classList.add('hidden');
-                }
-
+                noRes.classList.toggle('hidden', count > 0);
             }, 300);
         }
 
         function jumpToDate(dateStr) {
             toggleSearch();
             document.getElementById('datePicker').value = dateStr;
-            const parts = dateStr.split('-');
-            const d = new Date(parts[0], parts[1] - 1, parts[2]);
-            updateDateDisplay(d);
+            updateDateDisplay(DateUtils.parse(dateStr));
             refreshView();
-        }
-
-        function sanitizeData(data) {
-            return data.map(row => {
-                return row.map(cell => {
-                    if (cell instanceof Date) {
-                        const safeDate = new Date(cell.getTime() + (12 * 60 * 60 * 1000));
-                        const y = safeDate.getUTCFullYear();
-                        const m = String(safeDate.getUTCMonth() + 1).padStart(2, '0');
-                        const d = String(safeDate.getUTCDate()).padStart(2, '0');
-                        return `${y}-${m}-${d}`;
-                    }
-                    return cell;
-                });
-            });
-        }
-
-        function generateMockData() {
-            const rows = [];
-            
-            // 1. Header Row (Dates)
-            // We need to ensure we cover "Today" so the user sees something
-            const dateRow = new Array(20).fill("");
-            const today = new Date();
-            // Align dates to columns. Let's say cols 1-7 are TR, 10-16 are EN.
-            // Actually the app relies on finding the specific date in the row.
-            // Let's populate the whole row with dates for simplicity of hit-testing.
-            for(let i=0; i<20; i++) {
-                const d = new Date(today);
-                d.setDate(today.getDate() + (i - 2)); // Start 2 days ago
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                dateRow[i] = `${y}-${m}-${day}`;
-            }
-            rows.push(dateRow);
-
-            // 2. Filler Rows (to satisfy offset lookups for time headers if strictly needed, mostly just spacing)
-            for(let i=0; i<4; i++) rows.push(new Array(20).fill(""));
-
-            // 3. Data Rows
-            const times = ["08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30"];
-            const subjsEN = ["Anatomy", "Histology", "Physiology", "Biochemistry", "Public Health", "Biophysics"];
-            const subjsTR = ["Anatomi", "Histoloji", "Fizyoloji", "Biyokimya", "Halk Sağlığı", "Biyofizik"];
-            
-            times.forEach(t => {
-                const row = new Array(20).fill("");
-                // Time Columns (0 for TR, 9 for EN usually, but our logic searches for pattern)
-                // Let's explicitly put time in col 0 and 9
-                row[0] = t;
-                row[9] = t;
-
-                for(let c=0; c<20; c++) {
-                    if(c === 0 || c === 9) continue;
-                    
-                    // Skip weekend columns (approximate)
-                    const dStr = dateRow[c];
-                    if(dStr) {
-                         const parts = dStr.split('-');
-                         const d = new Date(parts[0], parts[1]-1, parts[2]);
-                         if(d.getDay() === 0 || d.getDay() === 6) continue;
-                    }
-
-                    if(Math.random() > 0.4) {
-                        const isLunch = t === "12:30" || t === "13:30";
-                        if(isLunch) {
-                            row[c] = (c < 8) ? "Öğle Arası" : "Lunch";
-                        } else {
-                            const pool = (c < 8) ? subjsTR : subjsEN;
-                            row[c] = pool[Math.floor(Math.random() * pool.length)];
-                            if(Math.random() > 0.7) row[c] += " (Lab)";
-                        }
-                    }
-                }
-                rows.push(row);
-            });
-            return rows;
         }
 
         async function initApp() {
             setLoading(true);
+            
+            // Try cache
             const cachedData = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
             if(cachedData) {
                 try {
                     workbookData = JSON.parse(cachedData);
-                    setLoading(false);
-                    buildSearchIndex(); 
-                    refreshView();
-                    document.getElementById('todayBtn').classList.remove('hidden');
+                    completeInit();
                     return; 
                 } catch(e) { console.error("Cache load error:", e); }
             }
+
             try {
-                // Attempt to fetch real schedule
+                // Try fetch
                 const response = await fetch(CONFIG.SCHEDULE_FILENAME + '?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("Auto-fetch failed");
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 let rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-                workbookData = sanitizeData(rawData);
-                try { localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, JSON.stringify(workbookData)); } catch (err) { console.error("Storage error:", err); }
-                setLoading(false);
-                buildSearchIndex(); 
-                refreshView();
-                document.getElementById('todayBtn').classList.remove('hidden');
+                
+                // Sanitize and Normalize Dates IMMEDIATELY
+                workbookData = rawData.map(row => row.map(cell => {
+                    if (cell instanceof Date) return DateUtils.normalize(cell); // Convert to YYYY-MM-DD
+                    return cell;
+                }));
+
+                localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, JSON.stringify(workbookData));
+                completeInit();
+
             } catch (err) {
                 console.warn("Fetch failed (Demo Mode):", err);
-                
-                // --- MOCK DATA FALLBACK ---
                 workbookData = generateMockData();
-                setLoading(false);
-                buildSearchIndex();
-                refreshView();
-                document.getElementById('todayBtn').classList.remove('hidden');
+                completeInit();
                 
-                // Show Demo Toast
+                // Demo Toast
                 const toast = document.createElement('div');
                 toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
                 toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
@@ -812,91 +682,62 @@
             }
         }
 
-        function normalizeDate(cellVal) {
-            if (!cellVal) return null;
-            if (cellVal instanceof Date) {
-                 const safeDate = new Date(cellVal.getTime() + (12 * 60 * 60 * 1000));
-                 return `${safeDate.getUTCFullYear()}-${String(safeDate.getUTCMonth() + 1).padStart(2, '0')}-${String(safeDate.getUTCDate()).padStart(2, '0')}`;
-            }
-            if (typeof cellVal === 'string') {
-                const s = cellVal.trim();
-                if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s; 
-                if (s.match(/^\d{4}-\d{2}-\d{2}T/)) return s.split('T')[0]; 
-            }
-            return null;
+        function completeInit() {
+            setLoading(false);
+            buildSearchIndexes();
+            refreshView();
+            document.getElementById('todayBtn').classList.remove('hidden');
         }
+
+        // --- 7. UI HELPERS ---
 
         function updateDayProgress() {
             const now = new Date();
             const start = new Date(now); start.setHours(8, 30, 0); 
             const end = new Date(now); end.setHours(17, 30, 0);   
-            const total = end - start;
-            const current = now - start;
-            let percent = 0;
-            if (now < start) percent = 0;
-            else if (now > end) percent = 100;
-            else percent = (current / total) * 100;
+            const percent = (now < start) ? 0 : (now > end) ? 100 : ((now - start) / (end - start)) * 100;
             document.getElementById('dayProgressBar').style.width = `${percent}%`;
         }
 
-        function vibrate() {
-            if (navigator.vibrate) navigator.vibrate(5);
-        }
-
         window.goToToday = function() {
-            vibrate();
-            const now = new Date();
-            const todayStr = getLocalDateString(now);
+            if (navigator.vibrate) navigator.vibrate(5);
+            const todayStr = DateUtils.getTodayString();
             document.getElementById('datePicker').value = todayStr;
-            updateDateDisplay(now);
-            
+            updateDateDisplay(new Date());
             if(viewMode === 'search') toggleSearch();
             
             const container = document.getElementById('scheduleContainer');
-            container.classList.remove('anim-slide-left', 'anim-slide-right', 'animate-fade-in-up');
+            container.classList.remove('animate-fade-in-up');
             void container.offsetWidth; 
             container.classList.add('animate-fade-in-up');
-
             refreshView();
         }
 
         window.changeDay = function(offset) {
-            vibrate();
+            if (navigator.vibrate) navigator.vibrate(5);
             const picker = document.getElementById('datePicker');
-            const currentVal = picker.value;
-            if (!currentVal) return;
+            if (!picker.value) return;
             
             if(viewMode === 'search') toggleSearch();
 
-            const parts = currentVal.split('-');
-            const currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
-            
+            const currentDate = DateUtils.parse(picker.value);
             const jump = viewMode === 'week' ? (offset * 7) : offset;
-            
             currentDate.setDate(currentDate.getDate() + jump);
             
-            if (viewMode === 'day') {
+            if (viewMode === 'day') { // Skip weekends
                 while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
                     currentDate.setDate(currentDate.getDate() + (offset > 0 ? 1 : -1));
                 }
             }
             
-            const newDateStr = getLocalDateString(currentDate);
-            picker.value = newDateStr;
+            picker.value = DateUtils.normalize(currentDate);
             updateDateDisplay(currentDate);
             
             const container = document.getElementById('scheduleContainer');
-            container.classList.remove('anim-slide-left', 'anim-slide-right', 'animate-fade-in-up');
+            container.classList.remove('animate-fade-in-up');
             void container.offsetWidth; 
-
+            container.classList.add('animate-fade-in-up'); // Re-trigger anim
             refreshView();
-            // Simple classes for direction animation if needed, though we use standard fade mostly now
-        }
-
-        window.toggleLanguage = function() {
-            vibrate();
-            const newLang = currentLang === 'EN' ? 'TR' : 'EN';
-            setLanguage(newLang);
         }
 
         window.setLanguage = function(lang, shouldProcess = true) {
@@ -905,60 +746,42 @@
             
             const trBtn = document.getElementById('lang-tr');
             const enBtn = document.getElementById('lang-en');
-            
-            const activeClass = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm transition-all";
-            const inactiveClass = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 dark:text-slate-500 transition-all hover:text-slate-600 dark:hover:text-slate-300";
+            const active = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm transition-all";
+            const inactive = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 dark:text-slate-500 transition-all hover:text-slate-600 dark:hover:text-slate-300";
 
-            if (lang === 'EN') {
-                enBtn.className = activeClass;
-                trBtn.className = inactiveClass;
-            } else {
-                trBtn.className = activeClass.replace('text-blue-600', 'text-red-600 dark:text-red-400');
-                enBtn.className = inactiveClass;
-            }
+            if (lang === 'EN') { enBtn.className = active; trBtn.className = inactive; } 
+            else { trBtn.className = active.replace('text-blue-600', 'text-red-600 dark:text-red-400'); enBtn.className = inactive; }
 
             const t = TRANSLATIONS[lang];
-            document.getElementById('txt-title').textContent = t.title;
-            document.getElementById('txt-subtitle').textContent = t.subtitle;
+            ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner', 'txt-install-title', 'txt-install-close'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.textContent = t[id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase())] || t[id.replace('txt-','')];
+            });
             document.getElementById('phase-icon').textContent = t.logoText;
-            document.getElementById('txt-loading').textContent = t.loading;
-            
-            document.getElementById('txt-install-banner').textContent = t.installBanner;
-            document.getElementById('txt-install-title').textContent = t.installTitle;
             document.getElementById('txt-install-ios').innerHTML = t.installIOS;
             document.getElementById('txt-install-android').innerHTML = t.installAndroid;
-            document.getElementById('txt-install-close').textContent = t.installClose;
 
-            if (workbookData) buildSearchIndex();
-
+            // Note: We don't need to rebuild index here anymore!
+            
             const pickerDate = document.getElementById('datePicker').value;
-            if(pickerDate) {
-                const parts = pickerDate.split('-');
-                const d = new Date(parts[0], parts[1] - 1, parts[2]);
-                updateDateDisplay(d);
-            }
+            if(pickerDate) updateDateDisplay(DateUtils.parse(pickerDate));
             if (shouldProcess && workbookData) refreshView();
-        }
-
-        function getLocalDateString(dateObj) {
-            if (!dateObj) return "";
-            const year = dateObj.getFullYear();
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
         }
 
         function updateDateDisplay(dateObj) {
             const today = new Date();
             const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
             const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+            
             const dStr = dateObj.toDateString();
             const locale = currentLang === 'TR' ? 'tr-TR' : 'en-US';
             const datePart = dateObj.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+            
             let label = null;
             if (dStr === today.toDateString()) label = TRANSLATIONS[currentLang].today;
             else if (dStr === tomorrow.toDateString()) label = TRANSLATIONS[currentLang].tomorrow;
             else if (dStr === yesterday.toDateString()) label = TRANSLATIONS[currentLang].yesterday;
+            
             const displayEl = document.getElementById('dateDisplay');
             if (label) {
                 displayEl.innerHTML = `<div class="flex flex-col items-center leading-none"><span class="text-[9px] text-blue-400 dark:text-blue-300 font-bold uppercase tracking-widest mb-0.5">${label}</span><span class="text-sm font-bold text-slate-800 dark:text-slate-200">${datePart}</span></div>`;
@@ -972,23 +795,11 @@
             for (let i = 0; i < row.length; i++) {
                 const val = row[i];
                 if (!val) continue;
-                if (val instanceof Date || (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/))) {
-                     return true; 
-                }
+                // Pre-check for simple date string YYYY-MM-DD which is now our standard in workbookData
+                if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
-                    if (s.match(/^committee\s*[\dIVX]+$/i)) return true;
-                    if (s.match(/^komite\s*[\dIVX]+$/i)) return true;
-                    if (s === 'committee' || s === 'komite') return true;
-                    if (s.match(/^phase\s*[\dIVX]+$/i)) return true;
-                    if (s.match(/^dönem\s*[\dIVX]+$/i)) return true;
-                    if (s.match(/^week\s*\d+$/)) return true; 
-                    if (s.match(/^\d+\s*week$/)) return true;
-                    if (s === 'week') return true; 
-                    if (s.match(/^hafta\s*\d+$/)) return true; 
-                    if (s.match(/^\d+\s*hafta$/)) return true;
-                    if (s.match(/^\d+\.\s*hafta$/)) return true; 
-                    if (s === 'hafta') return true; 
+                    if (s.match(/^(committee|komite|phase|dönem|week|hafta)\s*[\dIVX.]+$/i) || s === 'week' || s === 'hafta') return true;
                 }
             }
             return false;
@@ -997,37 +808,25 @@
         function isGarbageContent(val) {
             if (!val) return false;
             const s = String(val).trim();
-            if (s.includes("GMT")) return true;
-            if (s.startsWith("(Thu") || s.startsWith("(Mon") || s.startsWith("(Tue") || s.startsWith("(Wed") || s.startsWith("(Fri")) return true;
-            if (s.match(/^\d+$/)) return true; 
+            if (s.includes("GMT") || s.match(/^\d+$/)) return true;
+            if (['mon','tue','wed','thu','fri'].some(d => s.toLowerCase().startsWith('('+d))) return true;
             const lower = s.toLocaleLowerCase('tr-TR');
-            if (lower === 'week' || lower === 'hafta') return true;
-            if (lower.startsWith('komite') || lower.startsWith('committee')) return true;
+            if (lower === 'week' || lower === 'hafta' || lower.startsWith('komite') || lower.startsWith('committee')) return true;
             return false;
         }
 
-        function showEmptyState(title, messages, iconHtml) {
-            const emptyState = document.getElementById('emptyState');
-            emptyState.classList.remove('hidden');
-            document.getElementById('txt-empty-title').textContent = title;
-            document.getElementById('emptyIcon').innerHTML = iconHtml;
-            let msgText = Array.isArray(messages) ? messages[Math.floor(Math.random() * messages.length)] : messages;
-            document.getElementById('txt-empty-desc').textContent = msgText;
-        }
-
         function getClassesForDate(targetDateString) {
-             if (!workbookData) return [];
-
+            if (!workbookData) return [];
             let dateRowIndex = -1;
             let targetColIndex = -1;
             const isEnglish = currentLang === 'EN';
             
+            // Because we normalized data on load, strict string comparison works!
             outerLoop:
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
-                    const normalized = normalizeDate(row[c]);
-                    if (normalized === targetDateString) {
+                    if (row[c] === targetDateString) {
                         if ((isEnglish && c > CONFIG.SPLIT_COLUMN_INDEX) || (!isEnglish && c <= CONFIG.SPLIT_COLUMN_INDEX)) {
                             dateRowIndex = r;
                             targetColIndex = c;
@@ -1041,18 +840,18 @@
             return extractClassesForColumn(dateRowIndex, targetColIndex);
         }
 
-        // Day View Handler
+        // --- 8. RENDERING LOGIC ---
+
         function processSchedule(targetDateString) {
             const container = document.getElementById('scheduleContainer');
             const emptyState = document.getElementById('emptyState');
             container.innerHTML = '';
             emptyState.classList.add('hidden');
 
-            const parts = targetDateString.split('-');
-            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            const dateObj = DateUtils.parse(targetDateString);
             const dayOfWeek = dateObj.getDay(); 
             if (dayOfWeek === 0 || dayOfWeek === 6) {
-                showEmptyState(TRANSLATIONS[currentLang].weekendTitle, WEEKEND_MESSAGES[currentLang], '<i class="fas fa-couch text-amber-300"></i>');
+                showEmptyState(TRANSLATIONS[currentLang].weekendTitle, MESSAGES.WEEKEND[currentLang], '<i class="fas fa-couch text-amber-300"></i>');
                 return;
             }
 
@@ -1066,46 +865,49 @@
                  return;
             }
 
-            const newYearItems = classes.filter(c => c.type === 'new_year_item');
-            if (newYearItems.length > 0) { showEmptyState(TRANSLATIONS[currentLang].newYearTitle, NEW_YEAR_MESSAGES[currentLang], '<i class="fas fa-glass-cheers text-pink-400"></i>'); return; }
-            const eidItems = classes.filter(c => c.type === 'eid_item');
-            if (eidItems.length > 0) { showEmptyState(TRANSLATIONS[currentLang].eidTitle, EID_MESSAGES[currentLang], '<i class="fas fa-moon text-yellow-400"></i>'); return; }
-            const holidayItems = classes.filter(c => c.type === 'holiday_item');
-            if (holidayItems.length > 0) { showEmptyState(TRANSLATIONS[currentLang].holidayTitle, HOLIDAY_MESSAGES[currentLang], '<i class="fas fa-umbrella-beach text-cyan-400"></i>'); return; }
+            // Check for full day events
+            const checkType = (type, title, msgs, icon) => {
+                if(classes.some(c => c.type === type)) {
+                     showEmptyState(title, msgs, icon);
+                     return true;
+                }
+                return false;
+            };
+
+            if(checkType('new_year_item', TRANSLATIONS[currentLang].newYearTitle, MESSAGES.NEW_YEAR[currentLang], '<i class="fas fa-glass-cheers text-pink-400"></i>')) return;
+            if(checkType('eid_item', TRANSLATIONS[currentLang].eidTitle, MESSAGES.EID[currentLang], '<i class="fas fa-moon text-yellow-400"></i>')) return;
+            if(checkType('holiday_item', TRANSLATIONS[currentLang].holidayTitle, MESSAGES.HOLIDAY[currentLang], '<i class="fas fa-umbrella-beach text-cyan-400"></i>')) return;
 
             const actualLessons = classes.filter(c => c.type !== 'lunch');
             if (actualLessons.length > 0 && actualLessons.every(c => c.type === 'freelance')) {
-                showEmptyState(TRANSLATIONS[currentLang].freelanceTitle, FREELANCE_MESSAGES[currentLang], '<i class="fas fa-laptop-house text-indigo-400"></i>');
+                showEmptyState(TRANSLATIONS[currentLang].freelanceTitle, MESSAGES.FREELANCE[currentLang], '<i class="fas fa-laptop-house text-indigo-400"></i>');
             } else {
                 renderClasses(classes, targetDateString);
             }
         }
 
-        // Week View Handler
         function renderWeekView(targetDateString) {
             const container = document.getElementById('weekContainer');
             container.innerHTML = '';
             
-            const parts = targetDateString.split('-');
-            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-            
+            const dateObj = DateUtils.parse(targetDateString);
             const day = dateObj.getDay();
             const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); 
             const monday = new Date(dateObj.setDate(diff));
 
-            // PERFORMANCE: Use DocumentFragment
             const fragment = document.createDocumentFragment();
+            const todayStr = DateUtils.getTodayString();
             
             for(let i=0; i<5; i++) {
                 const currentDay = new Date(monday);
                 currentDay.setDate(monday.getDate() + i);
-                const dateStr = getLocalDateString(currentDay);
+                const dateStr = DateUtils.normalize(currentDay);
                 const classes = getClassesForDate(dateStr);
                 
                 const col = document.createElement('div');
                 col.className = "flex flex-col gap-2 min-h-[200px]";
                 
-                const isToday = dateStr === getLocalDateString(new Date());
+                const isToday = dateStr === todayStr;
                 const headerBg = isToday ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200';
                 
                 const locale = currentLang === 'TR' ? 'tr-TR' : 'en-US';
@@ -1124,18 +926,11 @@
                 } else {
                     classes.forEach(cls => {
                         let cardClass = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700";
-                        
-                        if (['holiday_item', 'new_year_item', 'eid_item'].includes(cls.type)) {
-                            cardClass = "bg-teal-50 dark:bg-teal-900/20 border-teal-100 dark:border-teal-900/50";
-                        } else if(cls.isLab) {
-                            cardClass = "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/50";
-                        } else if(cls.isClinical) {
-                            cardClass = "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/50";
-                        } else if(cls.type === 'freelance') {
-                            cardClass = "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60";
-                        } else if(cls.type === 'lunch') {
-                            cardClass = "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed opacity-80";
-                        }
+                        if (['holiday_item', 'new_year_item', 'eid_item'].includes(cls.type)) cardClass = "bg-teal-50 dark:bg-teal-900/20 border-teal-100 dark:border-teal-900/50";
+                        else if(cls.isLab) cardClass = "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/50";
+                        else if(cls.isClinical) cardClass = "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/50";
+                        else if(cls.type === 'freelance') cardClass = "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60";
+                        else if(cls.type === 'lunch') cardClass = "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed opacity-80";
 
                         col.innerHTML += `
                             <div class="p-3 rounded-xl border ${cardClass} shadow-sm text-sm">
@@ -1153,14 +948,11 @@
         function renderClasses(classes, targetDateStr) {
             const container = document.getElementById('scheduleContainer');
             const t = TRANSLATIONS[currentLang];
-            
-            // PERFORMANCE: Use DocumentFragment
             const fragment = document.createDocumentFragment();
 
             classes.forEach((cls, index) => {
                 const isNow = checkIsNow(cls.time, targetDateStr);
                 const isLunch = cls.type === 'lunch';
-                const isFreelance = cls.type === 'freelance';
                 const isLast = index === classes.length - 1;
                 const card = document.createElement('div');
                 
@@ -1172,9 +964,8 @@
                 let icon = "fa-clock";
                 let cardBg = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm hover:border-blue-200 dark:hover:border-blue-700";
                 let timeColor = "text-slate-400 dark:text-slate-500"; 
-
                 let badgeHtml = '';
-                
+
                 if (isNow) {
                     circleClass = "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900 scale-110 shadow-lg shadow-blue-200/50 dark:shadow-none"; 
                     iconClass = "text-white"; 
@@ -1184,7 +975,7 @@
                     circleClass = "bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800"; 
                     iconClass = "text-amber-500 dark:text-amber-400"; icon = "fa-utensils"; 
                     cardBg = "bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed";
-                } else if (isFreelance) {
+                } else if (cls.type === 'freelance') {
                     circleClass = "bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600"; 
                     iconClass = "text-slate-400 dark:text-slate-500"; icon = "fa-book-reader"; 
                     cardBg = "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 border-dashed opacity-80";
@@ -1197,11 +988,15 @@
                     iconClass = "text-violet-500 dark:text-violet-400"; icon = "fa-stethoscope"; 
                     cardBg = "bg-violet-50/50 dark:bg-violet-900/10 border-violet-200 dark:border-violet-900/30 shadow-md border-l-4 border-l-violet-500 dark:border-l-violet-600";
                 }
-                
+
+                if (cls.isLab) badgeHtml = `<span class="bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 ml-2">${t.badgeLab}</span>`;
+                else if (cls.isClinical) badgeHtml = `<span class="bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-bold px-2 py-0.5 rounded border border-violet-200 dark:border-violet-800 ml-2">${t.badgeClinical}</span>`;
+                if (isNow) badgeHtml += `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse shadow-sm shadow-blue-200 dark:shadow-none ml-2">${t.now}</span>`;
+
                 let linesHtml = '';
                 cls.lines.forEach((line, idx) => {
                     if (isLunch) linesHtml += `<div class="font-bold text-amber-700/80 dark:text-amber-500 text-base leading-tight italic">${line}</div>`;
-                    else if (isFreelance) linesHtml += `<div class="font-medium text-slate-500 dark:text-slate-400 italic text-base">${line}</div>`;
+                    else if (cls.type === 'freelance') linesHtml += `<div class="font-medium text-slate-500 dark:text-slate-400 italic text-base">${line}</div>`;
                     else {
                         if (idx === 0) linesHtml += `<div class="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight mb-1">${line}</div>`;
                         else if (idx === 1) linesHtml += `<div class="font-medium text-slate-600 dark:text-slate-400 text-sm leading-snug mb-2">${line}</div>`;
@@ -1209,30 +1004,17 @@
                     }
                 });
 
-                if (cls.isLab) badgeHtml = `<span class="bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 ml-2">${t.badgeLab}</span>`;
-                else if (cls.isClinical) badgeHtml = `<span class="bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-bold px-2 py-0.5 rounded border border-violet-200 dark:border-violet-800 ml-2">${t.badgeClinical}</span>`;
-                if (isNow) badgeHtml += `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse shadow-sm shadow-blue-200 dark:shadow-none ml-2">${t.now}</span>`;
-
                 card.innerHTML = `
                     <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
-                        <!-- Time -->
-                        <div class="flex flex-col items-end pt-4 pr-3 w-14 shrink-0 md:w-auto md:pt-6 md:pr-2">
-                            <span class="text-xs md:text-xl ${timeColor} font-bold tracking-tight font-mono">${cls.time}</span>
-                        </div>
-                        <!-- Axis -->
+                        <div class="flex flex-col items-end pt-4 pr-3 w-14 shrink-0 md:w-auto md:pt-6 md:pr-2"><span class="text-xs md:text-xl ${timeColor} font-bold tracking-tight font-mono">${cls.time}</span></div>
                         <div class="relative flex flex-col items-center shrink-0 md:pt-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center z-10 ${circleClass} transition-all duration-300">
-                                <i class="fas ${icon} ${iconClass} text-sm"></i>
-                            </div>
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center z-10 ${circleClass} transition-all duration-300"><i class="fas ${icon} ${iconClass} text-sm"></i></div>
                             <div class="time-connector mobile-connector md:hidden"></div>
                             <div class="time-connector desktop-connector hidden md:block"></div>
                         </div>
-                        <!-- Content -->
                         <div class="flex-1 min-w-0 pl-3 md:pl-0 pb-8 md:pb-6">
                             <div class="p-5 rounded-2xl border ${cardBg} transition-all duration-300 h-full flex flex-col justify-center">
-                                <div class="flex justify-between items-center ${badgeHtml ? 'mb-2' : ''} md:mb-1">
-                                    <div class="flex items-center">${badgeHtml}</div>
-                                </div>
+                                <div class="flex justify-between items-center ${badgeHtml ? 'mb-2' : ''} md:mb-1"><div class="flex items-center">${badgeHtml}</div></div>
                                 <div>${linesHtml}</div>
                             </div>
                         </div>
@@ -1240,33 +1022,75 @@
                 `;
                 fragment.appendChild(card);
             });
-            
             container.appendChild(fragment);
-
             setTimeout(() => {
                 const active = container.querySelector('.glow-border');
                 if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
             }, 600);
         }
 
-        function checkIsNow(timeStr, targetDateStr) {
-            const todayStr = getLocalDateString(new Date());
-            if (targetDateStr !== todayStr) return false;
-            try {
-                const parts = timeStr.split(':');
-                const h = parseInt(parts[0]);
-                const m = parseInt(parts[1]);
-                const now = new Date();
-                const curMins = now.getHours() * 60 + now.getMinutes();
-                const startMins = h * 60 + m;
-                let endMins = startMins + 50; 
-                return curMins >= startMins && curMins < endMins;
-            } catch(e) { return false; }
+        // --- 9. MOCK DATA ---
+
+        function generateMockData() {
+            const rows = [];
+            const dateRow = new Array(20).fill("");
+            const today = new Date();
+            for(let i=0; i<20; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + (i - 2)); 
+                dateRow[i] = DateUtils.normalize(d);
+            }
+            rows.push(dateRow);
+            for(let i=0; i<4; i++) rows.push(new Array(20).fill(""));
+
+            const times = ["08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30"];
+            const subjsEN = ["Anatomy", "Histology", "Physiology", "Biochemistry", "Public Health", "Biophysics"];
+            const subjsTR = ["Anatomi", "Histoloji", "Fizyoloji", "Biyokimya", "Halk Sağlığı", "Biyofizik"];
+            
+            times.forEach(t => {
+                const row = new Array(20).fill("");
+                row[0] = t; row[9] = t;
+                for(let c=0; c<20; c++) {
+                    if(c === 0 || c === 9) continue;
+                    const dStr = dateRow[c];
+                    if(dStr) {
+                         const d = DateUtils.parse(dStr);
+                         if(d.getDay() === 0 || d.getDay() === 6) continue;
+                    }
+                    if(Math.random() > 0.4) {
+                        if(t === "12:30" || t === "13:30") row[c] = (c < 8) ? "Öğle Arası" : "Lunch";
+                        else {
+                            const pool = (c < 8) ? subjsTR : subjsEN;
+                            row[c] = pool[Math.floor(Math.random() * pool.length)] + (Math.random() > 0.7 ? " (Lab)" : "");
+                        }
+                    }
+                }
+                rows.push(row);
+            });
+            return rows;
         }
 
-        function setLoading(isLoading) {
-            document.getElementById('loadingState').classList.toggle('hidden', !isLoading);
+        function highlightMatch(text, term) {
+            if (!term) return text;
+            try {
+                const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                return text.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-900/60 text-slate-900 dark:text-yellow-100 rounded px-0.5 box-decoration-clone">$1</span>');
+            } catch(e) { return text; }
         }
+
+        function showEmptyState(title, messages, iconHtml) {
+            const emptyState = document.getElementById('emptyState');
+            emptyState.classList.remove('hidden');
+            document.getElementById('txt-empty-title').textContent = title;
+            document.getElementById('emptyIcon').innerHTML = iconHtml;
+            document.getElementById('txt-empty-desc').textContent = Array.isArray(messages) ? messages[Math.floor(Math.random() * messages.length)] : messages;
+        }
+
+        function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
+        function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
+        function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
+        function setLoading(isLoading) { document.getElementById('loadingState').classList.toggle('hidden', !isLoading); }
     </script>
 </body>
 </html>
