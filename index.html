@@ -74,15 +74,25 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300">
 
-    <!-- Install Notification Bar -->
-    <div id="installBanner" class="hidden bg-indigo-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-md relative z-50 cursor-pointer hover:bg-indigo-700 transition-colors" onclick="openInstallModal()">
-        <div class="flex items-center gap-2 mx-auto md:mx-0">
-            <i class="fas fa-mobile-alt text-indigo-200"></i>
-            <span id="txt-install-banner">Add to Home Screen</span>
+    <!-- Install Notification Banner (Inviting Redesign) -->
+    <div id="installBanner" class="hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-[gradientMove_5s_ease_infinite] text-white px-4 py-3 shadow-lg relative z-50 cursor-pointer border-b border-white/10" onclick="openInstallModal()">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-inner border border-white/10">
+                    <i class="fas fa-download text-white text-sm"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span id="txt-install-banner-title" class="font-bold text-sm tracking-wide leading-tight">Install App</span>
+                    <span id="txt-install-banner-desc" class="text-[11px] text-indigo-100/90 font-medium leading-tight">Get offline access & faster loading</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="hidden md:inline-block text-xs font-bold bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">Install</span>
+                <button onclick="event.stopPropagation(); closeInstallBanner()" class="text-white/60 hover:text-white p-2 -mr-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
         </div>
-        <button onclick="event.stopPropagation(); closeInstallBanner()" class="text-indigo-200 hover:text-white p-1">
-            <i class="fas fa-times"></i>
-        </button>
     </div>
 
     <!-- Header -->
@@ -194,7 +204,7 @@
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700">
             <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
-            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App</h3>
+            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App 🚀</h3>
             <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
                 <div class="text-3xl text-slate-800 dark:text-slate-200"><i class="fab fa-apple"></i></div>
                 <div><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">iOS (Safari)</h4><p id="txt-install-ios" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p></div>
@@ -298,7 +308,9 @@
                 freelanceTitle: "Self-Study Day", holidayTitle: "Semester Break", newYearTitle: "Happy New Year!",
                 eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 fetchError: "Could not auto-load 'schedule.xlsx'.",
-                installBanner: "Add to Home Screen", installTitle: "Install App",
+                installBannerTitle: "Install App",
+                installBannerDesc: "Get offline access & faster loading",
+                installTitle: "Install App 🚀",
                 installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
                 installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
                 installClose: "Got it"
@@ -311,7 +323,9 @@
                 freelanceTitle: "Bireysel Çalışma Günü", holidayTitle: "İyi Tatiller!", newYearTitle: "Mutlu Yıllar!",
                 eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", 
                 fetchError: "'schedule.xlsx' bulunamadı.",
-                installBanner: "Ana Ekrana Ekle", installTitle: "Uygulamayı Yükle",
+                installBannerTitle: "Uygulamayı Yükle",
+                installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
+                installTitle: "Uygulamayı Yükle 🚀",
                 installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
                 installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
                 installClose: "Tamam"
@@ -760,9 +774,17 @@
             else { trBtn.className = active.replace('text-blue-600', 'text-red-600 dark:text-red-400'); enBtn.className = inactive; }
 
             const t = TRANSLATIONS[lang];
-            ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner', 'txt-install-title', 'txt-install-close'].forEach(id => {
+            ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner-title', 'txt-install-banner-desc', 'txt-install-title', 'txt-install-close'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.textContent = t[id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase())] || t[id.replace('txt-','')];
+                // Handle different possible key mappings
+                const key = id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                // Also check direct key 'installBannerTitle' etc.
+                if(el) {
+                    // Try direct match first (e.g. installBannerTitle)
+                    if (t[key]) el.textContent = t[key];
+                    // Else try with id stripped
+                    else if (t[id.replace('txt-','')]) el.textContent = t[id.replace('txt-','')];
+                }
             });
             document.getElementById('phase-icon').textContent = t.logoText;
             document.getElementById('txt-install-ios').innerHTML = t.installIOS;
