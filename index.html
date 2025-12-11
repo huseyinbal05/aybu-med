@@ -15,7 +15,21 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+                        'modal-pop': 'modalFadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            'from': { opacity: '0', transform: 'translateY(15px) scale(0.98)' },
+                            'to': { opacity: '1', transform: 'translateY(0) scale(1)' }
+                        },
+                        modalFadeIn: {
+                            'from': { opacity: '0', transform: 'scale(0.95)' },
+                            'to': { opacity: '1', transform: 'scale(1)' }
+                        }
+                    }
                 }
             }
         }
@@ -26,45 +40,8 @@
     <style>
         body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         
-        .glass-header {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-        }
-        .dark .glass-header {
-            background: rgba(15, 23, 42, 0.96);
-            border-bottom: 1px solid rgba(51, 65, 85, 0.8);
-        }
-
-        /* Timeline Connector Logic */
-        .time-connector {
-            position: absolute;
-            background: #e2e8f0;
-            z-index: 0;
-        }
-        .dark .time-connector { background: #334155; }
-        
-        .mobile-connector {
-            left: 23px; top: 45px; bottom: -20px; width: 2px;
-        }
-
-        @media (min-width: 768px) {
-            .desktop-connector {
-                left: 50%; transform: translateX(-50%); top: 3rem; bottom: -2rem; width: 2px; display: block;
-            }
-        }
-
-        .last-item .time-connector { display: none; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .card-enter { opacity: 0; animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-
-        .glow-border { position: relative; background: white; z-index: 1; transition: transform 0.3s ease; }
-        .dark .glow-border { background: #1e293b; } /* slate-800 */
-        
+        /* Complex gradient animation that is hard to do purely in Tailwind utilities */
+        .glow-border { position: relative; z-index: 1; transition: transform 0.3s ease; }
         .glow-border::before {
             content: ""; position: absolute; inset: -2px; border-radius: 20px;
             background: linear-gradient(135deg, #60a5fa, #8b5cf6, #3b82f6);
@@ -72,38 +49,29 @@
         }
         @keyframes gradientMove { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
 
-        /* FIX: Added touch-action: manipulation to prevent double-tap zoom on buttons */
-        .btn-press { 
-            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); 
-            touch-action: manipulation; 
+        /* Timeline Connector Logic - Position specific */
+        .time-connector { position: absolute; z-index: 0; }
+        .mobile-connector { left: 23px; top: 45px; bottom: -20px; width: 2px; }
+        .desktop-connector { display: none; }
+        .last-item .time-connector { display: none; }
+        @media (min-width: 768px) {
+            .desktop-connector { left: 50%; transform: translateX(-50%); top: 3rem; bottom: -2rem; width: 2px; display: block; }
         }
+
+        .btn-press { transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); touch-action: manipulation; }
         .btn-press:active { transform: scale(0.92); }
 
-        .progress-container { height: 3px; width: 100%; background: #f1f5f9; position: absolute; bottom: 0; left: 0; }
-        .dark .progress-container { background: #1e293b; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); width: 0%; transition: width 1s linear; border-radius: 0 2px 2px 0; }
-
-        .toggle-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
-        
-        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-        /* Search Styles */
+        /* Search Container Animation */
         #searchContainer { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 0; overflow: hidden; opacity: 0; }
         #searchContainer.open { max-height: 80px; opacity: 1; margin-top: 0.5rem; }
     </style>
-    <!-- Early Theme Script to prevent flash -->
+    <!-- Early Theme Script -->
     <script>
         (function() {
             const savedTheme = localStorage.getItem('aybu_theme_v1');
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
                 document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
             }
         })();
     </script>
@@ -122,7 +90,7 @@
     </div>
 
     <!-- Header -->
-    <header class="glass-header sticky top-0 z-40 px-4 md:px-8 pt-3 pb-2 shadow-sm transition-all duration-300">
+    <header class="sticky top-0 z-40 px-4 md:px-8 pt-3 pb-2 shadow-sm transition-all duration-300 bg-white/96 dark:bg-slate-900/96 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-700/80">
         <div class="max-w-6xl mx-auto flex flex-col gap-3">
             
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -195,8 +163,8 @@
             </div>
         </div>
         
-        <div class="progress-container">
-            <div id="dayProgressBar" class="progress-bar"></div>
+        <div class="h-[3px] w-full bg-slate-100 dark:bg-slate-800 absolute bottom-0 left-0">
+            <div id="dayProgressBar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 w-0 transition-[width] duration-1000 ease-linear rounded-r-sm"></div>
         </div>
     </header>
 
@@ -212,32 +180,50 @@
         <div id="searchResultsContainer" class="hidden mt-4 space-y-4"></div>
 
         <!-- Empty State / Error State -->
-        <div id="emptyState" class="hidden text-center py-24 px-6 card-enter">
+        <div id="emptyState" class="hidden text-center py-24 px-6 animate-fade-in-up">
             <div id="emptyIcon" class="text-6xl text-slate-200 dark:text-slate-700 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
             <h3 id="txt-empty-title" class="text-2xl font-bold text-slate-700 dark:text-slate-300">No Classes Found</h3>
             <p id="txt-empty-desc" class="text-slate-400 dark:text-slate-500 text-base max-w-[280px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
         </div>
 
         <!-- No Search Results -->
-        <div id="noSearchResults" class="hidden text-center py-16 px-6 card-enter">
+        <div id="noSearchResults" class="hidden text-center py-16 px-6 animate-fade-in-up">
              <div class="text-4xl text-slate-200 dark:text-slate-700 mb-4 inline-block"><i class="fas fa-search"></i></div>
              <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">No matching classes</h3>
              <p class="text-slate-400 dark:text-slate-500 text-sm">Try searching for a subject name or room.</p>
         </div>
 
-        <!-- Loading -->
-        <div id="loadingState" class="hidden text-center py-32">
-            <div class="inline-block relative">
-                <div class="w-16 h-16 border-4 border-blue-100 dark:border-slate-700 border-t-blue-600 rounded-full animate-spin"></div>
+        <!-- Skeleton Loading State -->
+        <div id="loadingState" class="hidden w-full max-w-3xl mx-auto mt-8 px-2">
+            <!-- Skeleton Items -->
+            <div class="space-y-8 animate-pulse">
+                <!-- Skeleton Item 1 -->
+                <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
+                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
+                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div>
+                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
+                </div>
+                 <!-- Skeleton Item 2 -->
+                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
+                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
+                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div>
+                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
+                </div>
+                 <!-- Skeleton Item 3 -->
+                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
+                    <div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div>
+                    <div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div></div>
+                    <div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div>
+                </div>
             </div>
-            <p id="txt-loading" class="text-slate-400 dark:text-slate-500 text-xs mt-6 font-bold tracking-widest uppercase animate-pulse">Loading...</p>
+            <p id="txt-loading" class="text-center text-slate-400 dark:text-slate-500 text-xs mt-8 font-bold tracking-widest uppercase">Loading Schedule...</p>
         </div>
 
     </main>
     
     <!-- Install Modal -->
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl modal-enter relative border border-white/20 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700">
             <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
             <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App</h3>
             <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
@@ -264,13 +250,19 @@
     </button>
 
     <script>
-        const SCHEDULE_FILENAME = 'schedule.xlsx'; 
+        // CONFIGURATION & MAGIC NUMBERS
+        const CONFIG = {
+            SCHEDULE_FILENAME: 'schedule.xlsx',
+            SPLIT_COLUMN_INDEX: 8, // Column index dividing TR and EN sections
+            STORAGE_KEYS: {
+                DATA: 'aybu_data_v48',
+                LANG: 'aybu_lang_v48',
+                THEME: 'aybu_theme_v1'
+            }
+        };
+
         let workbookData = null;
-        let searchIndex = []; // Stores the global index of all classes
-        
-        const STORAGE_KEY_DATA = 'aybu_data_v48'; 
-        const STORAGE_KEY_LANG = 'aybu_lang_v48';
-        const STORAGE_KEY_THEME = 'aybu_theme_v1';
+        let searchIndex = []; 
         let currentLang = 'EN';
         let viewMode = 'day'; // 'day', 'week', 'search'
 
@@ -319,14 +311,13 @@
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             
             function applyTheme() {
-                const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-                // If saved is 'dark', OR if nothing saved and system is dark -> Dark Mode
+                const savedTheme = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
                 const systemDark = mediaQuery.matches;
                 let isDark = false;
                 
                 if (savedTheme === 'dark') isDark = true;
                 else if (savedTheme === 'light') isDark = false;
-                else isDark = systemDark; // Auto mode
+                else isDark = systemDark; 
                 
                 if (isDark) {
                     document.documentElement.classList.add('dark');
@@ -340,16 +331,14 @@
             // Apply on load
             applyTheme();
 
-            // Listen for system changes
             mediaQuery.addEventListener('change', () => {
-                // Only follow system if user hasn't manually overridden via the button
-                if (!localStorage.getItem(STORAGE_KEY_THEME)) {
+                if (!localStorage.getItem(CONFIG.STORAGE_KEYS.THEME)) {
                     applyTheme();
                 }
             });
 
             // Lang Init
-            const savedLang = localStorage.getItem(STORAGE_KEY_LANG);
+            const savedLang = localStorage.getItem(CONFIG.STORAGE_KEYS.LANG);
             if (savedLang) setLanguage(savedLang, false);
             else setLanguage('EN', false);
 
@@ -363,7 +352,6 @@
                 const d = new Date(parts[0], parts[1] - 1, parts[2]); 
                 updateDateDisplay(d);
                 if (document.getElementById('searchContainer').classList.contains('open')) {
-                   // If search is open, clicking date should probably close search
                    toggleSearch();
                 } else {
                    refreshView();
@@ -393,9 +381,9 @@
             }
             
             if (next === systemDark) {
-                localStorage.removeItem(STORAGE_KEY_THEME);
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.THEME);
             } else {
-                localStorage.setItem(STORAGE_KEY_THEME, next ? 'dark' : 'light');
+                localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, next ? 'dark' : 'light');
             }
         }
 
@@ -407,7 +395,7 @@
         function toggleViewMode() {
             if (viewMode === 'search') {
                 viewMode = 'day';
-                toggleSearch(); // close search
+                toggleSearch(); 
                 return;
             }
             viewMode = viewMode === 'day' ? 'week' : 'day';
@@ -420,10 +408,9 @@
             const pickerVal = document.getElementById('datePicker').value;
             if(!pickerVal || !workbookData) return;
             
-            // Hide Search Results
             document.getElementById('searchResultsContainer').classList.add('hidden');
             document.getElementById('noSearchResults').classList.add('hidden');
-            document.getElementById('dateControls').classList.remove('hidden'); // Show dates
+            document.getElementById('dateControls').classList.remove('hidden'); 
 
             if (viewMode === 'day') {
                 document.getElementById('scheduleContainer').classList.remove('hidden');
@@ -449,43 +436,39 @@
             
             if(container.classList.contains('open')) {
                 input.focus();
-                viewMode = 'search'; // track state
+                viewMode = 'search'; 
                 document.getElementById('scheduleContainer').classList.add('hidden');
                 document.getElementById('weekContainer').classList.add('hidden');
                 document.getElementById('emptyState').classList.add('hidden');
-                document.getElementById('dateControls').classList.add('hidden'); // Hide date controls while searching
+                document.getElementById('dateControls').classList.add('hidden'); 
                 handleGlobalSearch(input.value);
             } else {
                 input.value = '';
-                viewMode = 'day'; // default back to day
+                viewMode = 'day'; 
                 document.getElementById('searchResultsContainer').innerHTML = '';
                 document.getElementById('searchResultsContainer').classList.add('hidden');
                 document.getElementById('noSearchResults').classList.add('hidden');
-                refreshView(); // restore view
+                refreshView(); 
                 input.blur();
             }
         }
 
         // --- GLOBAL SEARCH ENGINE ---
         
-        // 1. Build Index (Run once on load/lang change)
         function buildSearchIndex() {
             if (!workbookData) return;
             searchIndex = [];
             const isEnglish = currentLang === 'EN';
-            const splitColumn = 8;
             
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
                     
-                    // Filter by language side
-                    if (isEnglish && c <= splitColumn) continue;
-                    if (!isEnglish && c > splitColumn) continue;
+                    if (isEnglish && c <= CONFIG.SPLIT_COLUMN_INDEX) continue;
+                    if (!isEnglish && c > CONFIG.SPLIT_COLUMN_INDEX) continue;
 
                     const dateStr = normalizeDate(row[c]);
                     if (dateStr) {
-                        // Exclude 'lunch' type items from search index to avoid clutter
                         const classes = extractClassesForColumn(r, c).filter(c => c.type !== 'lunch');
                         if (classes.length > 0) {
                             searchIndex.push({ date: dateStr, items: classes });
@@ -495,7 +478,6 @@
             }
         }
 
-        // Helper to extract classes given a specific Date Header coordinate
         function extractClassesForColumn(dateRowIndex, targetColIndex) {
             const classes = [];
             const isEnglish = currentLang === 'EN';
@@ -512,10 +494,10 @@
                 }
                 if (timeColIndex !== -1) break;
             }
-            if (timeColIndex === -1) timeColIndex = isEnglish ? 9 : 0; // Fallback
+            if (timeColIndex === -1) timeColIndex = isEnglish ? 9 : 0; 
 
             let r = dateRowIndex + 1;
-            const maxRows = Math.min(workbookData.length, dateRowIndex + 60); // Limit lookahead
+            const maxRows = Math.min(workbookData.length, dateRowIndex + 60); 
 
             while (r < maxRows) {
                 const row = workbookData[r];
@@ -557,13 +539,11 @@
                         const rawJoined = contentLines.join(" ");
                         const joinedLower = rawJoined.toLocaleLowerCase('tr-TR');
                         
-                        // Basic Types
                         let isLab = rawJoined.toUpperCase().includes("LAB") && !joinedLower.includes("inkılab") && !joinedLower.includes("history");
                         const isClinical = CLINICAL_KEYWORDS.some(kw => joinedLower.includes(kw));
                         const isFreelance = joinedLower.includes("freelance") || joinedLower.includes("bireysel");
                         const isLunchText = joinedLower.includes("lunch") || joinedLower.includes("öğle arası");
                         
-                        // Holiday Types
                         const isNewYear = NEW_YEAR_KEYWORDS.some(kw => joinedLower.includes(kw));
                         const isEid = EID_KEYWORDS.some(kw => joinedLower.includes(kw));
                         const isHoliday = HOLIDAY_KEYWORDS.some(kw => joinedLower.includes(kw));
@@ -581,14 +561,12 @@
                              classes.push({ time: timeSlot, lines: contentLines, raw: rawJoined, isLab, isClinical, type: type });
                         }
                     } else if (isLunchTime) {
-                        // Add default lunch if empty at lunch time
                         classes.push({ time: timeSlot, lines: [TRANSLATIONS[currentLang].lunch], raw: "Lunch", isLab: false, isClinical: false, type: 'lunch' });
                     }
                 }
                 r++;
             }
             
-            // Deduplicate Lunches: Keep only the first one found
             const uniqueClasses = [];
             let lunchAdded = false;
             for (const cls of classes) {
@@ -602,6 +580,19 @@
                 }
             }
             return uniqueClasses;
+        }
+
+        // Highlight Helper
+        function highlightMatch(text, term) {
+            if (!term) return text;
+            try {
+                // Escape regex characters to prevent errors
+                const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                return text.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-900/60 text-slate-900 dark:text-yellow-100 rounded px-0.5 box-decoration-clone">$1</span>');
+            } catch(e) {
+                return text; 
+            }
         }
 
         // 2. Handle Input (Debounced)
@@ -624,9 +615,11 @@
                 container.innerHTML = '';
                 
                 let count = 0;
-                const maxResults = 50; // Limit rendering for perf
+                const maxResults = 50; 
+                
+                // PERFORMANCE: Use DocumentFragment
+                const fragment = document.createDocumentFragment();
 
-                // Filter Index
                 for (const day of searchIndex) {
                     const matches = day.items.filter(item => item.raw.toLowerCase().includes(term));
                     if (matches.length > 0) {
@@ -639,7 +632,7 @@
                             <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">${dateObj.toLocaleDateString(currentLang==='TR'?'tr-TR':'en-US', { weekday:'short', month:'short', day:'numeric' })}</span>
                             <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
                         `;
-                        container.appendChild(dateHeader);
+                        fragment.appendChild(dateHeader);
 
                         // Render Items
                         matches.forEach(item => {
@@ -651,21 +644,27 @@
                             if(item.isLab) highlightClass = "text-rose-600 dark:text-rose-400";
                             if(item.isClinical) highlightClass = "text-violet-600 dark:text-violet-400";
 
+                            // Apply Highlight
+                            const line0 = highlightMatch(item.lines[0], term);
+                            const line1 = item.lines.length > 1 ? highlightMatch(item.lines[1], term) : '';
+
                             card.innerHTML = `
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
-                                        <div class="font-bold text-sm ${highlightClass}">${item.lines[0]}</div>
-                                        ${item.lines.length > 1 ? `<div class="text-xs text-slate-500 mt-1">${item.lines[1]}</div>` : ''}
+                                        <div class="font-bold text-sm ${highlightClass}">${line0}</div>
+                                        ${item.lines.length > 1 ? `<div class="text-xs text-slate-500 mt-1">${line1}</div>` : ''}
                                     </div>
                                     <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded-lg ml-3">${item.time}</span>
                                 </div>
                             `;
-                            container.appendChild(card);
+                            fragment.appendChild(card);
                             count++;
                         });
                     }
                     if (count >= maxResults) break; 
                 }
+
+                container.appendChild(fragment);
 
                 if (count === 0) {
                     noRes.classList.remove('hidden');
@@ -677,14 +676,11 @@
         }
 
         function jumpToDate(dateStr) {
-            // Close search
             toggleSearch();
-            // Set date
             document.getElementById('datePicker').value = dateStr;
             const parts = dateStr.split('-');
             const d = new Date(parts[0], parts[1] - 1, parts[2]);
             updateDateDisplay(d);
-            // Refresh
             refreshView();
         }
 
@@ -703,35 +699,111 @@
             });
         }
 
+        function generateMockData() {
+            const rows = [];
+            
+            // 1. Header Row (Dates)
+            // We need to ensure we cover "Today" so the user sees something
+            const dateRow = new Array(20).fill("");
+            const today = new Date();
+            // Align dates to columns. Let's say cols 1-7 are TR, 10-16 are EN.
+            // Actually the app relies on finding the specific date in the row.
+            // Let's populate the whole row with dates for simplicity of hit-testing.
+            for(let i=0; i<20; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + (i - 2)); // Start 2 days ago
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                dateRow[i] = `${y}-${m}-${day}`;
+            }
+            rows.push(dateRow);
+
+            // 2. Filler Rows (to satisfy offset lookups for time headers if strictly needed, mostly just spacing)
+            for(let i=0; i<4; i++) rows.push(new Array(20).fill(""));
+
+            // 3. Data Rows
+            const times = ["08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30"];
+            const subjsEN = ["Anatomy", "Histology", "Physiology", "Biochemistry", "Public Health", "Biophysics"];
+            const subjsTR = ["Anatomi", "Histoloji", "Fizyoloji", "Biyokimya", "Halk Sağlığı", "Biyofizik"];
+            
+            times.forEach(t => {
+                const row = new Array(20).fill("");
+                // Time Columns (0 for TR, 9 for EN usually, but our logic searches for pattern)
+                // Let's explicitly put time in col 0 and 9
+                row[0] = t;
+                row[9] = t;
+
+                for(let c=0; c<20; c++) {
+                    if(c === 0 || c === 9) continue;
+                    
+                    // Skip weekend columns (approximate)
+                    const dStr = dateRow[c];
+                    if(dStr) {
+                         const parts = dStr.split('-');
+                         const d = new Date(parts[0], parts[1]-1, parts[2]);
+                         if(d.getDay() === 0 || d.getDay() === 6) continue;
+                    }
+
+                    if(Math.random() > 0.4) {
+                        const isLunch = t === "12:30" || t === "13:30";
+                        if(isLunch) {
+                            row[c] = (c < 8) ? "Öğle Arası" : "Lunch";
+                        } else {
+                            const pool = (c < 8) ? subjsTR : subjsEN;
+                            row[c] = pool[Math.floor(Math.random() * pool.length)];
+                            if(Math.random() > 0.7) row[c] += " (Lab)";
+                        }
+                    }
+                }
+                rows.push(row);
+            });
+            return rows;
+        }
+
         async function initApp() {
             setLoading(true);
-            const cachedData = localStorage.getItem(STORAGE_KEY_DATA);
+            const cachedData = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
             if(cachedData) {
                 try {
                     workbookData = JSON.parse(cachedData);
                     setLoading(false);
-                    buildSearchIndex(); // Build index immediately
+                    buildSearchIndex(); 
                     refreshView();
                     document.getElementById('todayBtn').classList.remove('hidden');
                     return; 
-                } catch(e) {}
+                } catch(e) { console.error("Cache load error:", e); }
             }
             try {
-                const response = await fetch(SCHEDULE_FILENAME + '?v=' + new Date().getTime());
+                // Attempt to fetch real schedule
+                const response = await fetch(CONFIG.SCHEDULE_FILENAME + '?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("Auto-fetch failed");
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 let rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                 workbookData = sanitizeData(rawData);
-                try { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(workbookData)); } catch (err) {}
+                try { localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, JSON.stringify(workbookData)); } catch (err) { console.error("Storage error:", err); }
                 setLoading(false);
-                buildSearchIndex(); // Build index
+                buildSearchIndex(); 
                 refreshView();
                 document.getElementById('todayBtn').classList.remove('hidden');
             } catch (err) {
+                console.warn("Fetch failed (Demo Mode):", err);
+                
+                // --- MOCK DATA FALLBACK ---
+                workbookData = generateMockData();
                 setLoading(false);
-                showEmptyState("Connection Error", TRANSLATIONS[currentLang].fetchError, '<i class="fas fa-wifi text-rose-300"></i>');
+                buildSearchIndex();
+                refreshView();
+                document.getElementById('todayBtn').classList.remove('hidden');
+                
+                // Show Demo Toast
+                const toast = document.createElement('div');
+                toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
+                toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
             }
         }
 
@@ -773,13 +845,12 @@
             document.getElementById('datePicker').value = todayStr;
             updateDateDisplay(now);
             
-            // Ensure search is closed
             if(viewMode === 'search') toggleSearch();
             
             const container = document.getElementById('scheduleContainer');
-            container.classList.remove('anim-slide-left', 'anim-slide-right', 'card-enter');
+            container.classList.remove('anim-slide-left', 'anim-slide-right', 'animate-fade-in-up');
             void container.offsetWidth; 
-            container.classList.add('card-enter');
+            container.classList.add('animate-fade-in-up');
 
             refreshView();
         }
@@ -790,19 +861,15 @@
             const currentVal = picker.value;
             if (!currentVal) return;
             
-            // Ensure search is closed
             if(viewMode === 'search') toggleSearch();
 
             const parts = currentVal.split('-');
             const currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
             
-            // If in Week view, jump by 7 days
             const jump = viewMode === 'week' ? (offset * 7) : offset;
             
-            // Simple date math
             currentDate.setDate(currentDate.getDate() + jump);
             
-            // Skip weekends only in Day view
             if (viewMode === 'day') {
                 while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
                     currentDate.setDate(currentDate.getDate() + (offset > 0 ? 1 : -1));
@@ -814,13 +881,11 @@
             updateDateDisplay(currentDate);
             
             const container = document.getElementById('scheduleContainer');
-            container.classList.remove('anim-slide-left', 'anim-slide-right', 'card-enter');
+            container.classList.remove('anim-slide-left', 'anim-slide-right', 'animate-fade-in-up');
             void container.offsetWidth; 
 
             refreshView();
-            if (viewMode === 'day' && workbookData) {
-                container.classList.add(offset > 0 ? 'anim-slide-right' : 'anim-slide-left');
-            }
+            // Simple classes for direction animation if needed, though we use standard fade mostly now
         }
 
         window.toggleLanguage = function() {
@@ -831,12 +896,11 @@
 
         window.setLanguage = function(lang, shouldProcess = true) {
             currentLang = lang;
-            localStorage.setItem(STORAGE_KEY_LANG, lang);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.LANG, lang);
             
             const trBtn = document.getElementById('lang-tr');
             const enBtn = document.getElementById('lang-en');
             
-            // Reset base classes
             const activeClass = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm transition-all";
             const inactiveClass = "px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-400 dark:text-slate-500 transition-all hover:text-slate-600 dark:hover:text-slate-300";
 
@@ -860,7 +924,6 @@
             document.getElementById('txt-install-android').innerHTML = t.installAndroid;
             document.getElementById('txt-install-close').textContent = t.installClose;
 
-            // Rebuild index for new language
             if (workbookData) buildSearchIndex();
 
             const pickerDate = document.getElementById('datePicker').value;
@@ -909,26 +972,17 @@
                 }
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
-                    
-                    // Headers & Titles (Stricter Checks)
-                    // Matches "Committee 1", "Komite 2", "Committee I", etc.
                     if (s.match(/^committee\s*[\dIVX]+$/i)) return true;
                     if (s.match(/^komite\s*[\dIVX]+$/i)) return true;
                     if (s === 'committee' || s === 'komite') return true;
-
-                    // Matches "Phase 1", "Dönem 1" strictly
                     if (s.match(/^phase\s*[\dIVX]+$/i)) return true;
                     if (s.match(/^dönem\s*[\dIVX]+$/i)) return true;
-                    
-                    // Week / Hafta Markers (Keep strict)
                     if (s.match(/^week\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*week$/)) return true;
                     if (s === 'week') return true; 
-                    
-                    // Turkish Week Patterns
                     if (s.match(/^hafta\s*\d+$/)) return true; 
                     if (s.match(/^\d+\s*hafta$/)) return true;
-                    if (s.match(/^\d+\.\s*hafta$/)) return true; // e.g. "1. Hafta"
+                    if (s.match(/^\d+\.\s*hafta$/)) return true; 
                     if (s === 'hafta') return true; 
                 }
             }
@@ -940,13 +994,10 @@
             const s = String(val).trim();
             if (s.includes("GMT")) return true;
             if (s.startsWith("(Thu") || s.startsWith("(Mon") || s.startsWith("(Tue") || s.startsWith("(Wed") || s.startsWith("(Fri")) return true;
-            if (s.match(/^\d+$/)) return true; // Pure numbers
-            
-            // Explicit ignore list
+            if (s.match(/^\d+$/)) return true; 
             const lower = s.toLocaleLowerCase('tr-TR');
             if (lower === 'week' || lower === 'hafta') return true;
             if (lower.startsWith('komite') || lower.startsWith('committee')) return true;
-            
             return false;
         }
 
@@ -959,22 +1010,20 @@
             document.getElementById('txt-empty-desc').textContent = msgText;
         }
 
-        // Extracts logic for finding classes for a specific date
         function getClassesForDate(targetDateString) {
              if (!workbookData) return [];
 
             let dateRowIndex = -1;
             let targetColIndex = -1;
             const isEnglish = currentLang === 'EN';
-            const splitColumn = 8; 
-
+            
             outerLoop:
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
                     const normalized = normalizeDate(row[c]);
                     if (normalized === targetDateString) {
-                        if ((isEnglish && c > splitColumn) || (!isEnglish && c <= splitColumn)) {
+                        if ((isEnglish && c > CONFIG.SPLIT_COLUMN_INDEX) || (!isEnglish && c <= CONFIG.SPLIT_COLUMN_INDEX)) {
                             dateRowIndex = r;
                             targetColIndex = c;
                             break outerLoop;
@@ -984,7 +1033,6 @@
             }
 
             if (dateRowIndex === -1) return [];
-            // Re-use our new helper
             return extractClassesForColumn(dateRowIndex, targetColIndex);
         }
 
@@ -1008,7 +1056,6 @@
 
             const classes = getClassesForDate(targetDateString);
 
-            // Handle special full-day events
             if (classes.length === 0) {
                  showEmptyState(TRANSLATIONS[currentLang].emptyTitle, [TRANSLATIONS[currentLang].emptyDesc], '<i class="fas fa-calendar-check"></i>');
                  return;
@@ -1037,12 +1084,12 @@
             const parts = targetDateString.split('-');
             const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
             
-            // Calculate Monday
             const day = dateObj.getDay();
             const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); 
             const monday = new Date(dateObj.setDate(diff));
 
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+            // PERFORMANCE: Use DocumentFragment
+            const fragment = document.createDocumentFragment();
             
             for(let i=0; i<5; i++) {
                 const currentDay = new Date(monday);
@@ -1050,11 +1097,9 @@
                 const dateStr = getLocalDateString(currentDay);
                 const classes = getClassesForDate(dateStr);
                 
-                // Column
                 const col = document.createElement('div');
                 col.className = "flex flex-col gap-2 min-h-[200px]";
                 
-                // Header
                 const isToday = dateStr === getLocalDateString(new Date());
                 const headerBg = isToday ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200';
                 
@@ -1095,14 +1140,18 @@
                         `;
                     });
                 }
-                container.appendChild(col);
+                fragment.appendChild(col);
             }
+            container.appendChild(fragment);
         }
 
         function renderClasses(classes, targetDateStr) {
             const container = document.getElementById('scheduleContainer');
             const t = TRANSLATIONS[currentLang];
             
+            // PERFORMANCE: Use DocumentFragment
+            const fragment = document.createDocumentFragment();
+
             classes.forEach((cls, index) => {
                 const isNow = checkIsNow(cls.time, targetDateStr);
                 const isLunch = cls.type === 'lunch';
@@ -1110,7 +1159,7 @@
                 const isLast = index === classes.length - 1;
                 const card = document.createElement('div');
                 
-                card.className = `relative card-enter ${isLast ? 'last-item' : ''} mb-0`;
+                card.className = `relative animate-fade-in-up ${isLast ? 'last-item' : ''} mb-0`;
                 card.style.animationDelay = `${index * 0.05}s`;
                 
                 let circleClass = "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600";
@@ -1119,8 +1168,7 @@
                 let cardBg = "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm hover:border-blue-200 dark:hover:border-blue-700";
                 let timeColor = "text-slate-400 dark:text-slate-500"; 
 
-                // Badges & Colors
-                let timeBadgeClass = "text-slate-500 bg-slate-100"; // Fallback for mobile badge if needed
+                let badgeHtml = '';
                 
                 if (isNow) {
                     circleClass = "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900 scale-110 shadow-lg shadow-blue-200/50 dark:shadow-none"; 
@@ -1156,51 +1204,40 @@
                     }
                 });
 
-                let badgeHtml = '';
                 if (cls.isLab) badgeHtml = `<span class="bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 ml-2">${t.badgeLab}</span>`;
                 else if (cls.isClinical) badgeHtml = `<span class="bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-bold px-2 py-0.5 rounded border border-violet-200 dark:border-violet-800 ml-2">${t.badgeClinical}</span>`;
                 if (isNow) badgeHtml += `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse shadow-sm shadow-blue-200 dark:shadow-none ml-2">${t.now}</span>`;
 
                 card.innerHTML = `
                     <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2">
-                        
-                        <!-- Time Column -->
+                        <!-- Time -->
                         <div class="flex flex-col items-end pt-4 pr-3 w-14 shrink-0 md:w-auto md:pt-6 md:pr-2">
                             <span class="text-xs md:text-xl ${timeColor} font-bold tracking-tight font-mono">${cls.time}</span>
                         </div>
-
-                        <!-- Timeline Axis Column -->
+                        <!-- Axis -->
                         <div class="relative flex flex-col items-center shrink-0 md:pt-4">
-                            <!-- The Dot/Icon -->
                             <div class="w-12 h-12 rounded-full flex items-center justify-center z-10 ${circleClass} transition-all duration-300">
                                 <i class="fas ${icon} ${iconClass} text-sm"></i>
                             </div>
-                            <!-- Connector Lines -->
                             <div class="time-connector mobile-connector md:hidden"></div>
                             <div class="time-connector desktop-connector hidden md:block"></div>
                         </div>
-
-                        <!-- Content Card Column -->
+                        <!-- Content -->
                         <div class="flex-1 min-w-0 pl-3 md:pl-0 pb-8 md:pb-6">
                             <div class="p-5 rounded-2xl border ${cardBg} transition-all duration-300 h-full flex flex-col justify-center">
-                                
-                                <!-- Card Header -->
                                 <div class="flex justify-between items-center ${badgeHtml ? 'mb-2' : ''} md:mb-1">
-                                    <div class="flex items-center">
-                                        ${badgeHtml}
-                                    </div>
+                                    <div class="flex items-center">${badgeHtml}</div>
                                 </div>
-                                
-                                <!-- Content -->
-                                <div>
-                                    ${linesHtml}
-                                </div>
+                                <div>${linesHtml}</div>
                             </div>
                         </div>
                     </div>
                 `;
-                container.appendChild(card);
+                fragment.appendChild(card);
             });
+            
+            container.appendChild(fragment);
+
             setTimeout(() => {
                 const active = container.querySelector('.glow-border');
                 if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
