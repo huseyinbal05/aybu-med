@@ -1029,6 +1029,21 @@
             }, 600);
         }
 
+        function checkIsNow(timeStr, targetDateStr) {
+            const todayStr = DateUtils.getTodayString();
+            if (targetDateStr !== todayStr) return false;
+            try {
+                const parts = timeStr.split(':');
+                const h = parseInt(parts[0]);
+                const m = parseInt(parts[1]);
+                const now = new Date();
+                const curMins = now.getHours() * 60 + now.getMinutes();
+                const startMins = h * 60 + m;
+                let endMins = startMins + 50; 
+                return curMins >= startMins && curMins < endMins;
+            } catch(e) { return false; }
+        }
+
         // --- 9. MOCK DATA ---
 
         function generateMockData() {
