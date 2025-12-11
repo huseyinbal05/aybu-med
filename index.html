@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AYBU Schedule</title>
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -11,12 +16,14 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         
+        /* Glass Header */
         .glass-header {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
+        /* Timeline Line */
         .time-connector {
             position: absolute;
             left: 23px;
@@ -28,6 +35,7 @@
         }
         .last-item .time-connector { display: none; }
 
+        /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(15px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -56,36 +64,60 @@
         .toggle-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
         .toggle-btn.active { background-color: white; color: #2563EB; border-color: #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .toggle-btn.inactive { background-color: transparent; color: #94a3b8; }
+
+        /* Install Modal Animation */
+        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-32">
 
-    <header class="glass-header sticky top-0 z-50 px-4 pt-3 pb-2 shadow-sm transition-all duration-300">
-        <div class="max-w-md mx-auto flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+    <!-- Install Notification Bar -->
+    <div id="installBanner" class="hidden bg-indigo-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-md relative z-50 cursor-pointer hover:bg-indigo-700 transition-colors" onclick="openInstallModal()">
+        <div class="flex items-center gap-2 mx-auto md:mx-0">
+            <i class="fas fa-mobile-alt text-indigo-200"></i>
+            <span id="txt-install-banner">Add to Home Screen</span>
+        </div>
+        <button onclick="event.stopPropagation(); closeInstallBanner()" class="text-indigo-200 hover:text-white p-1">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-40 px-4 md:px-8 pt-3 pb-2 shadow-sm transition-all duration-300">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center justify-between md:justify-start gap-4">
+                <div class="flex items-center gap-3 cursor-default">
                     <div id="phase-icon" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-blue-200/50 transform transition-transform hover:rotate-3">
                         D1
                     </div>
                     <div>
-                        <h1 id="txt-title" class="font-extrabold text-sm leading-tight text-slate-900 tracking-tight">Phase I</h1>
-                        <p id="txt-subtitle" class="text-[10px] text-slate-500 font-bold tracking-wide uppercase">AYBU Medicine</p>
+                        <h1 id="txt-title" class="font-extrabold text-sm md:text-base leading-tight text-slate-900 tracking-tight">Phase I</h1>
+                        <p id="txt-subtitle" class="text-[10px] md:text-xs text-slate-500 font-bold tracking-wide uppercase">AYBU Medicine</p>
                     </div>
                 </div>
-                <div class="flex bg-slate-100/80 p-1 rounded-lg">
-                    <button onclick="setLanguage('TR')" id="btn-tr" class="toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md">TR</button>
-                    <button onclick="setLanguage('EN')" id="btn-en" class="toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md">EN</button>
+
+                <!-- Language Toggle (Visible on Mobile here, moved to right on Desktop) -->
+                <div class="flex md:hidden bg-slate-100/80 p-1 rounded-lg">
+                    <button onclick="setLanguage('TR')" id="btn-tr-mob" class="toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md">TR</button>
+                    <button onclick="setLanguage('EN')" id="btn-en-mob" class="toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md">EN</button>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between gap-2 bg-slate-100/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 shadow-sm">
+            <!-- Date Controls (Center on Desktop) -->
+            <div class="flex items-center justify-between gap-2 bg-slate-100/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 shadow-sm w-full md:w-auto md:min-w-[320px]">
                 <button onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm hover:text-blue-600 transition-colors">
                     <i class="fas fa-chevron-left text-xs"></i>
                 </button>
                 
                 <div class="relative flex-1 group h-10">
                     <input type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
-                    <div class="flex items-center justify-center gap-3 w-full h-full bg-white border border-slate-200/60 rounded-xl shadow-sm group-hover:border-blue-300 group-active:bg-slate-50 transition-all px-2">
+                    <div class="flex items-center justify-center gap-3 w-full h-full bg-white border border-slate-200/60 rounded-xl shadow-sm group-hover:border-blue-300 group-active:bg-slate-50 transition-all px-2 cursor-pointer">
                         <div id="dateDisplay" class="flex-1 text-center select-none"></div>
                     </div>
                 </div>
@@ -94,58 +126,94 @@
                     <i class="fas fa-chevron-right text-xs"></i>
                 </button>
             </div>
+
+            <!-- Language Toggle (Desktop Only) -->
+            <div class="hidden md:flex bg-slate-100/80 p-1 rounded-lg">
+                <button onclick="setLanguage('TR')" id="btn-tr-desk" class="toggle-btn btn-press px-3 py-1.5 text-xs font-bold rounded-md transition-all hover:bg-white/50">TR</button>
+                <button onclick="setLanguage('EN')" id="btn-en-desk" class="toggle-btn btn-press px-3 py-1.5 text-xs font-bold rounded-md transition-all hover:bg-white/50">EN</button>
+            </div>
+
         </div>
         <div class="progress-container">
             <div id="dayProgressBar" class="progress-bar"></div>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4">
+    <main class="w-full max-w-3xl mx-auto p-4 md:p-8">
 
-        <div id="uploadSection" class="hidden bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 p-8 text-center mt-6 transition-all hover:translate-y-[-2px]">
-            <div class="animate-float w-20 h-20 bg-gradient-to-tr from-blue-50 to-indigo-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-5 text-3xl shadow-inner border border-blue-100">
+        <!-- Upload (Fallback) -->
+        <div id="uploadSection" class="hidden bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 p-8 md:p-12 text-center mt-6 transition-all hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-blue-100/50">
+            <div class="animate-float w-24 h-24 bg-gradient-to-tr from-blue-50 to-indigo-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner border border-blue-100">
                 <i class="fas fa-cloud-upload-alt"></i>
             </div>
-            <h2 id="txt-load-title" class="text-xl font-bold text-slate-800 mb-2 tracking-tight">Load Schedule</h2>
-            <p id="txt-load-desc" class="text-slate-500 text-sm mb-4 px-2 leading-relaxed">Upload the 2025-2026 TR-ING Excel file.</p>
-            <p id="fetch-error-msg" class="hidden text-rose-500 text-xs font-bold bg-rose-50 p-2 rounded-lg mb-6 border border-rose-100">
-                <i class="fas fa-exclamation-circle mr-1"></i> Auto-load failed.
+            <h2 id="txt-load-title" class="text-2xl font-bold text-slate-800 mb-3 tracking-tight">Load Schedule</h2>
+            <p id="txt-load-desc" class="text-slate-500 text-base mb-8 px-4 leading-relaxed max-w-md mx-auto">Upload the 2025-2026 TR-ING Excel file.</p>
+            
+            <p id="fetch-error-msg" class="hidden text-rose-500 text-sm font-bold bg-rose-50 p-3 rounded-xl mb-6 border border-rose-100 max-w-sm mx-auto flex items-center justify-center gap-2">
+                <i class="fas fa-exclamation-circle"></i> <span>Auto-load failed.</span>
             </p>
-            <label class="block w-full cursor-pointer group btn-press">
-                <span class="block w-full bg-blue-600 group-hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-3">
+
+            <label class="block w-full max-w-sm mx-auto cursor-pointer group btn-press">
+                <span class="block w-full bg-blue-600 group-hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-3 text-lg">
                     <i class="fas fa-folder-open"></i> <span id="txt-select-file">Select File</span>
                 </span>
                 <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden">
             </label>
         </div>
 
+        <!-- Schedule Container -->
         <div id="scheduleContainer" class="hidden space-y-0 mt-4 relative pl-1 pb-10"></div>
 
+        <!-- Empty State -->
         <div id="emptyState" class="hidden text-center py-24 px-6 card-enter">
-            <div id="emptyIcon" class="text-6xl text-slate-200 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
-            <h3 id="txt-empty-title" class="text-xl font-bold text-slate-700">No Classes Found</h3>
-            <p id="txt-empty-desc" class="text-slate-400 text-sm mt-2 max-w-[250px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
+            <div id="emptyIcon" class="text-7xl text-slate-200 mb-6 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
+            <h3 id="txt-empty-title" class="text-2xl font-bold text-slate-700 mb-2">No Classes Found</h3>
+            <p id="txt-empty-desc" class="text-slate-400 text-base max-w-[280px] mx-auto leading-relaxed font-medium">Check the date or switch language.</p>
         </div>
 
+        <!-- Loading -->
         <div id="loadingState" class="hidden text-center py-32">
             <div class="inline-block relative">
-                <div class="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
             </div>
-            <p id="txt-loading" class="text-slate-400 text-xs mt-4 font-bold tracking-widest uppercase animate-pulse">Loading...</p>
+            <p id="txt-loading" class="text-slate-400 text-xs mt-6 font-bold tracking-widest uppercase animate-pulse">Loading...</p>
         </div>
 
     </main>
     
-    <!-- Sync/Reset Button -->
-    <button id="resetBtn" onclick="resetApp()" class="hidden fixed bottom-8 right-6 bg-white text-rose-500 w-14 h-14 rounded-2xl shadow-2xl shadow-rose-900/10 border border-rose-50 flex items-center justify-center z-40 btn-press transition-all hover:bg-rose-50 group" title="Reset">
+    <!-- Install Guide Modal -->
+    <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-[2rem] max-w-sm w-full p-6 shadow-2xl modal-enter relative border border-white/20">
+            <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 mb-6 text-center">Install App</h3>
+            <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-100 transition-colors">
+                <div class="text-3xl text-slate-800"><i class="fab fa-apple"></i></div>
+                <div>
+                    <h4 class="font-bold text-slate-700 text-sm mb-1">iOS (Safari)</h4>
+                    <p id="txt-install-ios" class="text-xs text-slate-500 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-green-100 transition-colors">
+                <div class="text-3xl text-green-500"><i class="fab fa-android"></i></div>
+                <div>
+                    <h4 class="font-bold text-slate-700 text-sm mb-1">Android (Chrome)</h4>
+                    <p id="txt-install-android" class="text-xs text-slate-500 leading-relaxed">1. Tap Menu <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Install App'</p>
+                </div>
+            </div>
+            <button onclick="closeInstallModal()" class="mt-6 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-all shadow-lg" id="txt-install-close">Got it</button>
+        </div>
+    </div>
+
+    <!-- Reset Button -->
+    <button id="resetBtn" onclick="resetApp()" class="hidden fixed bottom-8 right-6 bg-white text-rose-500 w-14 h-14 rounded-2xl shadow-2xl shadow-rose-900/10 border border-rose-50 flex items-center justify-center z-40 btn-press transition-all hover:bg-rose-50 group md:bottom-10 md:right-10" title="Reset">
         <i class="fas fa-sync-alt text-lg group-hover:rotate-180 transition-transform duration-700"></i>
     </button>
 
     <script>
         const SCHEDULE_FILENAME = 'schedule.xlsx'; 
         let workbookData = null;
-        const STORAGE_KEY_DATA = 'aybu_data_v44'; 
-        const STORAGE_KEY_LANG = 'aybu_lang_v44';
+        const STORAGE_KEY_DATA = 'aybu_data_v46'; 
+        const STORAGE_KEY_LANG = 'aybu_lang_v46';
         let currentLang = 'EN'; 
 
         const TRANSLATIONS = {
@@ -155,7 +223,12 @@
                 now: "NOW", lunch: "Lunch Break", freelance: "Freelance / Self Study", today: "Today", tomorrow: "Tomorrow",
                 yesterday: "Yesterday", dateNotFound: "Date not found in English section.", weekendTitle: "Weekend Vibes",
                 freelanceTitle: "Self-Study Day", holidayTitle: "Semester Break", newYearTitle: "Happy New Year!",
-                eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", fetchError: "Could not auto-load 'schedule.xlsx'."
+                eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", 
+                fetchError: "Could not auto-load 'schedule.xlsx'.",
+                installBanner: "Add to Home Screen", installTitle: "Install App",
+                installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
+                installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
+                installClose: "Got it"
             },
             TR: {
                 title: "Dönem I", subtitle: "AYBÜ Tıp Fakültesi", loadTitle: "Hoş Geldiniz", loadDesc: "Ders programını yükleyin.",
@@ -163,7 +236,12 @@
                 now: "ŞU AN", lunch: "Öğle Arası", freelance: "Bireysel Çalışma", today: "Bugün", tomorrow: "Yarın",
                 yesterday: "Dün", dateNotFound: "Türkçe bölümünde tarih bulunamadı.", weekendTitle: "Hafta Sonu Modu",
                 freelanceTitle: "Bireysel Çalışma Günü", holidayTitle: "İyi Tatiller!", newYearTitle: "Mutlu Yıllar!",
-                eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", fetchError: "'schedule.xlsx' bulunamadı."
+                eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", 
+                fetchError: "'schedule.xlsx' bulunamadı.",
+                installBanner: "Ana Ekrana Ekle", installTitle: "Uygulamayı Yükle",
+                installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
+                installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
+                installClose: "Tamam"
             }
         };
 
@@ -198,7 +276,16 @@
             document.getElementById('fileInput').addEventListener('change', handleUpload);
             setInterval(updateDayProgress, 60000); 
             initApp();
+            
+            if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('installBannerDismissed')) {
+                document.getElementById('installBanner').classList.remove('hidden');
+            }
         });
+
+        // Modal Logic
+        function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
+        function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
+        function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
 
         async function initApp() {
             setLoading(true);
@@ -213,7 +300,6 @@
                 } catch(e) {}
             }
             try {
-                // Cache-busting parameter added
                 const response = await fetch(SCHEDULE_FILENAME + '?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("Auto-fetch failed");
                 const arrayBuffer = await response.arrayBuffer();
@@ -228,7 +314,7 @@
                 setLoading(false);
                 document.getElementById('uploadSection').classList.remove('hidden');
                 document.getElementById('fetch-error-msg').classList.remove('hidden');
-                document.getElementById('fetch-error-msg').textContent = TRANSLATIONS[currentLang].fetchError;
+                document.getElementById('fetch-error-msg').children[1].textContent = TRANSLATIONS[currentLang].fetchError;
             }
         }
 
@@ -257,19 +343,15 @@
 
             const parts = currentVal.split('-');
             const currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
-            
             do {
                 currentDate.setDate(currentDate.getDate() + offset);
             } while (currentDate.getDay() === 0 || currentDate.getDay() === 6); 
-            
             const newDateStr = getLocalDateString(currentDate);
             picker.value = newDateStr;
             updateDateDisplay(currentDate);
-            
             const container = document.getElementById('scheduleContainer');
             container.classList.remove('anim-slide-left', 'anim-slide-right', 'card-enter');
             void container.offsetWidth; 
-
             if (workbookData) {
                 processSchedule(newDateStr);
                 container.classList.add(offset > 0 ? 'anim-slide-right' : 'anim-slide-left');
@@ -280,8 +362,17 @@
             vibrate();
             currentLang = lang;
             localStorage.setItem(STORAGE_KEY_LANG, lang);
-            document.getElementById('btn-tr').className = `toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md ${lang === 'TR' ? 'active' : 'inactive'}`;
-            document.getElementById('btn-en').className = `toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md ${lang === 'EN' ? 'active' : 'inactive'}`;
+            
+            // Update Mobile Buttons
+            const mobClass = "toggle-btn btn-press px-3 py-1.5 text-[10px] font-bold rounded-md";
+            document.getElementById('btn-tr-mob').className = `${mobClass} ${lang === 'TR' ? 'active' : 'inactive'}`;
+            document.getElementById('btn-en-mob').className = `${mobClass} ${lang === 'EN' ? 'active' : 'inactive'}`;
+            
+            // Update Desktop Buttons
+            const deskClass = "toggle-btn btn-press px-3 py-1.5 text-xs font-bold rounded-md transition-all hover:bg-white/50";
+            document.getElementById('btn-tr-desk').className = `${deskClass} ${lang === 'TR' ? 'active' : 'inactive'}`;
+            document.getElementById('btn-en-desk').className = `${deskClass} ${lang === 'EN' ? 'active' : 'inactive'}`;
+
             const t = TRANSLATIONS[lang];
             document.getElementById('txt-title').textContent = t.title;
             document.getElementById('txt-subtitle').textContent = t.subtitle;
@@ -290,8 +381,16 @@
             document.getElementById('txt-select-file').textContent = t.selectFile;
             document.getElementById('phase-icon').textContent = t.logoText;
             document.getElementById('txt-loading').textContent = t.loading;
+            
+            // Install UI
+            document.getElementById('txt-install-banner').textContent = t.installBanner;
+            document.getElementById('txt-install-title').textContent = t.installTitle;
+            document.getElementById('txt-install-ios').innerHTML = t.installIOS;
+            document.getElementById('txt-install-android').innerHTML = t.installAndroid;
+            document.getElementById('txt-install-close').textContent = t.installClose;
+
             if(!document.getElementById('fetch-error-msg').classList.contains('hidden')) {
-                document.getElementById('fetch-error-msg').textContent = t.fetchError;
+                document.getElementById('fetch-error-msg').children[1].textContent = t.fetchError;
             }
             const pickerDate = document.getElementById('datePicker').value;
             if(pickerDate) {
@@ -310,38 +409,20 @@
             return `${year}-${month}-${day}`;
         }
 
-        // --- FIXED DATE PARSING (12H Buffer + String Support) ---
         function normalizeDate(cellVal) {
             if (!cellVal) return null;
-            
-            let dateObj = null;
-
-            // 1. If it's already a Date object (Fresh from SheetJS)
             if (cellVal instanceof Date) {
-                dateObj = cellVal;
-            } 
-            // 2. If it's a string (from LocalStorage/JSON)
-            else if (typeof cellVal === 'string') {
-                const s = cellVal.trim();
-                // Check if ISO format (T) or simple date
-                if (s.match(/^\d{4}-\d{2}-\d{2}T/) || s.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    const d = new Date(s);
-                    if (!isNaN(d.getTime())) {
-                        dateObj = d;
-                    }
-                }
-            }
-
-            // Apply 12-Hour Shift to fix "Previous Day" bug
-            if (dateObj) {
-                // Add 12 hours (noon safety)
-                const safeDate = new Date(dateObj.getTime() + (12 * 60 * 60 * 1000));
+                const safeDate = new Date(cellVal.getTime() + (12 * 60 * 60 * 1000));
                 const year = safeDate.getUTCFullYear();
                 const month = String(safeDate.getUTCMonth() + 1).padStart(2, '0');
                 const day = String(safeDate.getUTCDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
             }
-
+            if (typeof cellVal === 'string') {
+                const s = cellVal.trim();
+                if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
+                if (s.match(/^\d{4}-\d{2}-\d{2}T/)) return s.split('T')[0];
+            }
             return null;
         }
 
@@ -378,7 +459,6 @@
                 try { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(workbookData)); } catch (err) {}
                 setLoading(false);
                 document.getElementById('uploadSection').classList.add('hidden');
-                document.getElementById('resetBtn').classList.remove('hidden');
                 processSchedule(document.getElementById('datePicker').value);
             };
             reader.readAsArrayBuffer(file);
@@ -389,8 +469,9 @@
             for (let i = 0; i < row.length; i++) {
                 const val = row[i];
                 if (!val) continue;
-                const dateStr = normalizeDate(val);
-                if (dateStr && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
+                if (val instanceof Date || (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/))) {
+                     return true; 
+                }
                 if (typeof val === 'string') {
                     const s = val.toLowerCase().trim();
                     if (s.includes("committee chairman")) return true;
@@ -637,7 +718,19 @@
             document.getElementById('loadingState').classList.toggle('hidden', !isLoading);
             if (isLoading) document.getElementById('uploadSection').classList.add('hidden');
         }
+
+        window.resetApp = function() {
+            vibrate();
+            document.getElementById('uploadSection').classList.remove('hidden');
+            document.getElementById('scheduleContainer').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('resetBtn').classList.add('hidden');
+            document.getElementById('fileInput').value = ""; 
+            workbookData = null;
+            localStorage.removeItem(STORAGE_KEY_DATA);
+            localStorage.removeItem(STORAGE_KEY_LANG);
+            initApp();
+        }
     </script>
 </body>
 </html>
-
