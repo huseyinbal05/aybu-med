@@ -77,6 +77,14 @@
         
         /* Safe area padding for iPhones with notches */
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        
+        /* Custom Scrollbar for desktop */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
     <script>
         (function() {
@@ -93,7 +101,7 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 flex flex-col">
 
     <div id="installBanner" class="hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-[gradientMove_5s_ease_infinite] text-white px-4 py-3 shadow-lg relative z-50 cursor-pointer border-b border-white/10">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-inner border border-white/10 animate-[bounce_2s_infinite]">
                     <i class="fas fa-download text-white text-sm"></i>
@@ -113,7 +121,7 @@
     </div>
 
     <header class="sticky top-0 z-40 px-3 md:px-8 pt-3 pb-2 shadow-sm transition-all duration-300 bg-white/96 dark:bg-slate-900/96 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-700/80">
-        <div class="max-w-6xl mx-auto flex flex-col gap-3">
+        <div class="max-w-7xl mx-auto flex flex-col gap-3">
             
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div class="flex items-center justify-between md:justify-start gap-2 md:gap-4 w-full md:w-auto">
@@ -199,10 +207,14 @@
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 md:p-8 flex-1">
-        <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0 content-optimized"></div>
-        <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 md:grid-cols-5 gap-4"></div>
-        <div id="searchResultsContainer" class="hidden mt-4 space-y-4"></div>
+    <main class="w-full max-w-7xl mx-auto p-4 md:p-8 flex-1">
+        <!-- Day View Container: Limited width on desktop for better readability -->
+        <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0 md:max-w-4xl md:mx-auto content-optimized"></div>
+        
+        <!-- Week View Container: Responsive Grid -->
+        <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"></div>
+        
+        <div id="searchResultsContainer" class="hidden mt-4 space-y-4 md:max-w-4xl md:mx-auto"></div>
 
         <div id="emptyState" class="hidden text-center py-24 px-6 animate-fade-in-up">
             <div id="emptyIcon" class="text-6xl text-slate-200 dark:text-slate-700 mb-5 transform transition-transform hover:scale-110 duration-300 inline-block"><i class="fas fa-calendar-check"></i></div>
@@ -262,7 +274,7 @@
         </button>
     </nav>
 
-    <footer class="w-full max-w-6xl mx-auto px-4 py-6 text-center pb-24 md:pb-6">
+    <footer class="w-full max-w-7xl mx-auto px-4 py-6 text-center pb-24 md:pb-6">
         <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 tracking-widest uppercase">
             AYBU Medicine Schedule • v2.6
         </div>
@@ -593,7 +605,7 @@
                     else if(l.includes('yoğurt') || l.includes('ayran')) { icon = 'fa-bottle-water'; color = 'text-blue-400'; }
 
                     const div = document.createElement('div');
-                    div.className = "bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl flex items-center gap-4 animate-fade-in-up border border-slate-100 dark:border-slate-700/50";
+                    div.className = "bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl flex items-center gap-4 animate-fade-in-up border border-slate-100 dark:border-slate-700/50 hover:border-blue-100 dark:hover:border-slate-600 transition-colors";
                     div.style.animationDelay = `${idx * 0.05}s`;
                     div.innerHTML = `
                         <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center shrink-0 shadow-sm">
@@ -612,7 +624,7 @@
             function renderMenuMessage(title, sub, icon, iconColor) {
                 const container = document.getElementById('menuContent');
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 border-dashed">
+                    <div class="flex flex-col items-center justify-center py-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 border-dashed col-span-full">
                         <i class="fas ${icon} ${iconColor} text-3xl mb-3"></i>
                         <h3 class="font-bold text-slate-700 dark:text-slate-200">${title}</h3>
                         <p class="text-xs text-slate-400">${sub}</p>
@@ -1361,7 +1373,7 @@
                     const dayNum = currentDay.getDate();
                     
                     let colContent = `
-                        <div class="p-3 rounded-xl ${headerBg} shadow-sm border border-slate-100 dark:border-slate-700 mb-2 text-center">
+                        <div class="p-3 rounded-xl ${headerBg} shadow-sm border border-slate-100 dark:border-slate-700 mb-2 text-center sticky top-20 z-10 md:static md:z-auto">
                             <div class="text-xs uppercase font-bold opacity-80">${dayName}</div>
                             <div class="text-lg font-bold">${dayNum}</div>
                         </div>
@@ -1383,7 +1395,7 @@
                             }
 
                             colContent += `
-                                <div class="p-3 rounded-xl border ${cardClass} shadow-sm text-sm">
+                                <div class="p-3 rounded-xl border ${cardClass} shadow-sm text-sm hover:shadow-md transition-shadow duration-200">
                                     <div class="font-mono text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">${cls.time}</div>
                                     <div class="font-bold text-slate-700 dark:text-slate-200 leading-tight line-clamp-3">${cls.lines[0]}</div>
                                 </div>
@@ -1450,7 +1462,7 @@
                     } else if (isLunch) {
                         circleClass = "bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800";
                         iconClass = "text-amber-500 dark:text-amber-400"; icon = "fa-utensils"; 
-                        cardBg = "bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed";
+                        cardBg = "bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30 border-dashed opacity-80";
                     } else if (cls.type === 'freelance') {
                         circleClass = "bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600";
                         iconClass = "text-slate-400 dark:text-slate-500"; icon = "fa-book-reader"; 
@@ -1498,7 +1510,7 @@
                                 <div class="time-connector desktop-connector hidden md:block"></div>
                             </div>
                             <div class="flex-1 min-w-0 pl-3 md:pl-0 pb-8 md:pb-6">
-                                <div class="p-5 rounded-2xl border ${cardBg} transition-all duration-300 h-full flex flex-col justify-center">
+                                <div class="p-5 rounded-2xl border ${cardBg} md:hover:scale-[1.01] md:hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-center">
                                     <div class="flex justify-between items-center ${badgeHtml ? 'mb-2' : ''} md:mb-1"><div class="flex items-center">${badgeHtml}</div></div>
                                     <div>${linesHtml}</div>
                                 </div>
@@ -1578,7 +1590,7 @@
         })();
     </script>
     <div id="menuModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] max-w-sm w-full h-[80vh] flex flex-col shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700 overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] max-w-sm md:max-w-4xl w-full h-[80vh] flex flex-col shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700 overflow-hidden">
         
         <div class="p-6 pb-2 shrink-0 flex justify-between items-center z-10 bg-white dark:bg-slate-900">
             <div>
@@ -1590,15 +1602,15 @@
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 pt-2 space-y-4 content-optimized" id="menuContainer">
+        <div class="flex-1 overflow-y-auto p-6 pt-2 content-optimized" id="menuContainer">
             <div id="menuLoading" class="flex flex-col items-center justify-center py-12">
                 <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fetching...</p>
             </div>
             
-            <div id="menuContent" class="hidden space-y-3 pb-4"></div>
+            <div id="menuContent" class="hidden space-y-3 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 pb-4"></div>
 
-            <div id="menuError" class="hidden flex flex-col items-center justify-center py-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6">
+            <div id="menuError" class="hidden flex flex-col items-center justify-center py-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 col-span-full">
                 <div class="text-3xl text-slate-300 mb-3"><i class="fas fa-wifi"></i></div>
                 <p class="text-xs text-slate-400 mb-4 font-medium">Menu unavailable offline.</p>
                 <a href="https://aybu.edu.tr/sks/tr/sayfa/6265/" target="_blank" class="text-blue-500 hover:underline text-xs font-bold">Open Website &rarr;</a>
