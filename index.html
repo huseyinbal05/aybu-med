@@ -374,34 +374,6 @@
             });
 
             function setupEventListeners() {
-                const mainContainer = document.querySelector('main');
-                let touchStartX = 0;
-                let touchEndX = 0;
-
-                mainContainer.addEventListener('touchstart', e => {
-                    touchStartX = e.changedTouches[0].screenX;
-                }, {passive: true});
-
-                mainContainer.addEventListener('touchend', e => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                }, {passive: true});
-
-                function handleSwipe() {
-                    const threshold = 50; // Min distance to trigger swipe
-                    const limit = 200;    // Max distance (ignore big scrolls)
-    
-                    if (viewMode !== 'day') return; // Only swipe in Day view
-                
-                    if (touchEndX < touchStartX - threshold && (touchStartX - touchEndX < limit)) {
-                        changeDay(1); // Swipe Left -> Next Day
-                    }
-                    
-                    if (touchEndX > touchStartX + threshold && (touchEndX - touchStartX < limit)) {
-                        changeDay(-1); // Swipe Right -> Prev Day
-                    }
-                }
-                
                 document.getElementById('installBanner').onclick = openInstallModal;
                 document.getElementById('closeInstallBtn').onclick = (e) => { e.stopPropagation(); closeInstallBanner(); };
                 document.getElementById('langToggleBtn').onclick = toggleLanguage;
