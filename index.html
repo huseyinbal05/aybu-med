@@ -121,9 +121,9 @@
                         
                         <!-- Dark Mode Toggle -->
                         <button onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
-                            <i id="darkModeIcon" class="fas fa-magic text-xs"></i>
-                            <!-- Optional Tooltip for desktop -->
-                            <span id="themeTooltip" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap hidden md:block">Auto</span>
+                            <i id="darkModeIcon" class="fas fa-circle-half-stroke text-xs"></i>
+                            <!-- Feedback Tooltip: Controlled via JS now -->
+                            <span id="themeTooltip" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50 shadow-sm">Auto</span>
                         </button>
 
                         <!-- View Toggle (Day/Week) -->
@@ -361,13 +361,15 @@
         });
 
         // REFACTORED THEME LOGIC START
+        let themeTooltipTimeout;
+
         function initTheme() {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const apply = () => {
                 const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
                 const isDark = saved === 'dark' || (!saved && mediaQuery.matches);
                 document.documentElement.classList.toggle('dark', isDark);
-                updateThemeIcon(saved); // Pass saved state directly
+                updateThemeIcon(saved, false); // False = don't flash tooltip on load
             };
             apply();
             mediaQuery.addEventListener('change', () => !localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) && apply());
@@ -390,25 +392,46 @@
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const isDark = next === 'dark' || (!next && mediaQuery.matches);
             document.documentElement.classList.toggle('dark', isDark);
-            updateThemeIcon(next);
+            updateThemeIcon(next, true); // True = flash tooltip for feedback
         }
 
-        function updateThemeIcon(state) {
+        function updateThemeIcon(state, showFeedback = false) {
             const icon = document.getElementById('darkModeIcon');
             const tooltip = document.getElementById('themeTooltip');
             if(!icon) return;
 
             // State can be 'light', 'dark', or null (auto)
+            let label = 'Auto';
             if (state === 'light') {
-                icon.className = 'fas fa-sun text-yellow-500';
-                if(tooltip) tooltip.textContent = 'Light';
+                icon.className = 'fas fa-sun text-yellow-500 text-xs';
+                label = 'Light';
             } else if (state === 'dark') {
-                icon.className = 'fas fa-moon text-blue-400';
-                if(tooltip) tooltip.textContent = 'Dark';
+                icon.className = 'fas fa-moon text-blue-400 text-xs';
+                label = 'Dark';
             } else {
                 // Auto
-                icon.className = 'fas fa-magic text-slate-400 dark:text-slate-500';
-                if(tooltip) tooltip.textContent = 'Auto';
+                icon.className = 'fas fa-circle-half-stroke text-slate-400 dark:text-slate-500 text-xs';
+                label = 'Auto';
+            }
+
+            if(tooltip) {
+                tooltip.textContent = label;
+                
+                if (showFeedback) {
+                    // Reset animation
+                    tooltip.classList.remove('opacity-0');
+                    tooltip.classList.add('opacity-100');
+                    
+                    clearTimeout(themeTooltipTimeout);
+                    themeTooltipTimeout = setTimeout(() => {
+                        tooltip.classList.remove('opacity-100');
+                        tooltip.classList.add('opacity-0');
+                    }, 1500); // Disappear after 1.5s
+                } else {
+                    // Ensure hidden if not feedback (e.g. on load)
+                    tooltip.classList.remove('opacity-100');
+                    tooltip.classList.add('opacity-0');
+                }
             }
         }
         // REFACTORED THEME LOGIC END
