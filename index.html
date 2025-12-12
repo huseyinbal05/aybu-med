@@ -241,7 +241,8 @@
 
     <!-- Footer -->
     <footer class="w-full text-center py-6">
-        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">AYBU Medicine • v2.6 UI</div>
+        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest mb-2">AYBU Medicine • v2.7 Final</div>
+        <button onclick="hardReset()" class="text-[9px] text-slate-300 hover:text-rose-400 dark:text-slate-600 dark:hover:text-rose-400 underline transition-colors">Reset Data</button>
     </footer>
 
     <!-- Floating Today Button -->
@@ -285,7 +286,7 @@
                 yesterday: "Yesterday", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 installBannerTitle: "Install App", installBannerDesc: "Faster loading & offline access",
                 weekendTitle: "Weekend Vibes", freelanceTitle: "Study Day", holidayTitle: "Holiday",
-                endsIn: "Ends in"
+                endsIn: "Ends in", startsIn: "Starts in"
             },
             TR: {
                 title: "Dönem I", subtitle: "AYBÜ Tıp",
@@ -294,7 +295,7 @@
                 yesterday: "Dün", badgeLab: "LAB", badgeClinical: "BECERİ",
                 installBannerTitle: "Uygulamayı Yükle", installBannerDesc: "Çevrimdışı ve hızlı erişim",
                 weekendTitle: "Hafta Sonu", freelanceTitle: "Çalışma Günü", holidayTitle: "Tatil",
-                endsIn: "Bitiş:"
+                endsIn: "Bitiş:", startsIn: "Başlangıç:"
             }
         };
 
@@ -619,6 +620,12 @@
             const container = document.getElementById('scheduleContainer');
             const t = TRANSLATIONS[currentLang];
             const fragment = document.createDocumentFragment();
+            let hasActiveNow = false;
+
+            // First pass to check if any class is active
+            if(targetDateStr === DateUtils.getTodayString()) {
+                hasActiveNow = classes.some(c => checkIsNow(c.time, targetDateStr));
+            }
 
             classes.forEach((cls, index) => {
                 const isNow = checkIsNow(cls.time, targetDateStr);
@@ -647,14 +654,12 @@
                     theme = { bg: 'bg-violet-50/80 dark:bg-violet-900/10', border: 'border-violet-100 dark:border-violet-900/30', text: 'text-slate-800 dark:text-slate-100' };
                     icon = 'fa-stethoscope'; iconColor = 'text-violet-500';
                 } else {
-                    // Auto Color for standard lectures
                     const palette = getSubjectColor(cls.lines[0]);
                     theme.bg = `bg-white dark:bg-slate-800`;
                     theme.border = `border-l-4 ${palette.border.replace('border', 'border-l')}`;
-                    iconColor = palette.text.split(' ')[0]; // Use the text color for icon
+                    iconColor = palette.text.split(' ')[0];
                 }
 
-                // NOW Styling Overrides
                 if (isNow) {
                     theme.bg = 'glow-border bg-white dark:bg-slate-800';
                     theme.border = 'border-transparent';
@@ -666,14 +671,20 @@
                 if(cls.isLab) badges += `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800">${t.badgeLab}</span>`;
                 if(cls.isClinical) badges += `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 border border-violet-200 dark:border-violet-800">${t.badgeClinical}</span>`;
                 
-                // Live Countdown Badge
+                // Active / Next Up Logic
                 let nowBadge = '';
-                if(isNow) {
+                if (isNow) {
                     const remaining = calculateRemaining(cls.time);
                     nowBadge = `<div class="absolute -top-3 right-4 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg shadow-blue-500/30 animate-pulse flex items-center gap-1"><i class="fas fa-clock"></i> <span>${t.endsIn} ${remaining}m</span></div>`;
+                } else if (!hasActiveNow && targetDateStr === DateUtils.getTodayString()) {
+                    // Check if this is the "Next Up" class
+                    const minsToStart = calculateMinsToStart(cls.time);
+                    if (minsToStart > 0 && minsToStart <= 60 && !hasActiveNow) { // only show for imminent next class
+                        nowBadge = `<div class="absolute -top-3 right-4 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg shadow-amber-500/30 flex items-center gap-1"><i class="fas fa-hourglass-start"></i> <span>${t.startsIn} ${minsToStart}m</span></div>`;
+                        hasActiveNow = true; // Prevent multiple "next up" badges
+                    }
                 }
 
-                // Render Content
                 const card = document.createElement('div');
                 card.className = `relative animate-fade-in-up mb-2 group ${isLast ? 'last-item' : ''}`;
                 card.style.animationDelay = `${index * 0.05}s`;
@@ -684,7 +695,6 @@
 
                 card.innerHTML = `
                     <div class="flex gap-4">
-                        <!-- Timeline Column -->
                         <div class="flex flex-col items-center w-14 pt-1 flex-shrink-0">
                             <span class="text-xs font-mono mb-2 ${timeColor} transition-transform">${cls.time}</span>
                             <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 ${circleBg} transition-all shadow-sm">
@@ -692,8 +702,6 @@
                             </div>
                             <div class="time-connector w-0.5 bg-slate-200 dark:bg-slate-800 flex-1 my-2"></div>
                         </div>
-                        
-                        <!-- Card Column -->
                         <div class="flex-1 pb-6 min-w-0">
                             <div class="relative p-4 rounded-2xl border ${theme.bg} ${theme.border} shadow-sm transition-all hover:shadow-md">
                                 ${nowBadge}
@@ -709,7 +717,6 @@
             });
             container.appendChild(fragment);
             
-            // Scroll to Now
             setTimeout(() => {
                 const active = container.querySelector('.glow-border');
                 if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -722,17 +729,25 @@
             try {
                 const [h, m] = startTimeStr.split(':').map(Number);
                 const now = new Date();
-                const endMins = (h * 60) + m + 50; // Assume 50 min classes
+                const endMins = (h * 60) + m + 50; 
                 const curMins = (now.getHours() * 60) + now.getMinutes();
                 return Math.max(0, endMins - curMins);
             } catch { return 0; }
         }
 
+        function calculateMinsToStart(startTimeStr) {
+            try {
+                const [h, m] = startTimeStr.split(':').map(Number);
+                const now = new Date();
+                const startMins = (h * 60) + m;
+                const curMins = (now.getHours() * 60) + now.getMinutes();
+                return startMins - curMins;
+            } catch { return -1; }
+        }
+
         function updateNowBadgeTimer() {
             const el = document.querySelector('.glow-border span'); 
-            if(el && el.innerText.includes('Ends')) {
-               // Update logic handled by interval or refresh
-            }
+            if(el && el.innerText.includes('Ends')) { /* logic handled by refresh */ }
         }
 
         function checkIsNow(timeStr, targetDateStr) {
@@ -762,6 +777,13 @@
             document.getElementById('dayProgressBar').style.width = `${pct}%`;
         }
 
+        function hardReset() {
+            if(confirm('Reset all data? This will fix sync issues but requires internet to reload schedule.')) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
         function goToToday() {
             const today = DateUtils.getTodayString();
             document.getElementById('datePicker').value = today;
@@ -782,9 +804,7 @@
             for (let i = 0; i < row.length; i++) {
                 const val = row[i];
                 if (!val) continue;
-                // Barrier 1: Date Format
                 if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
-                // Barrier 2: Keywords like "Committee", "Week 2", etc.
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
                     if (s.match(/^(committee|komite|phase|dönem|week|hafta)\s*[\dIVX.]+$/i) || s === 'week' || s === 'hafta') return true;
@@ -795,8 +815,6 @@
 
         function getClassesForDate(dateStr) {
             if(!workbookData) return [];
-            
-            // 1. Find Row Index
             let rIdx = -1, cIdx = -1, isEn = currentLang === 'EN';
             for(let r=0; r<workbookData.length; r++) {
                 const row = workbookData[r];
@@ -811,10 +829,7 @@
             }
             if(rIdx === -1) return [];
 
-            // 2. Extract Items with Barrier Detection
             const items = [];
-            
-            // Determine time column: scan near 8:30
             let timeCol = -1;
             for(let offset=1; offset<=4; offset++) {
                 const checkRow = workbookData[rIdx + offset];
@@ -825,14 +840,14 @@
                 }
                 if(timeCol !== -1) break;
             }
-            if(timeCol === -1) timeCol = isEn ? 9 : 0; // Fallback
+            if(timeCol === -1) timeCol = isEn ? 9 : 0; 
             
             let r = rIdx + 1;
             const maxR = Math.min(workbookData.length, rIdx + 60);
 
             while(r < maxR) {
                 const row = workbookData[r];
-                if(isRowBarrier(row)) break; // STOP Extraction at barrier
+                if(isRowBarrier(row)) break; 
 
                 const tVal = String(row[timeCol]||"").trim();
                 const tMatch = tVal.match(/(\d{1,2})[:.](\d{2})/);
@@ -841,24 +856,20 @@
                     const time = `${tMatch[1]}:${tMatch[2]}`;
                     const lines = [];
                     const val = String(row[cIdx]||"").trim();
-                    
-                    // Simple filter for garbage like "Mon", "Tue"
                     const isGarbage = (s) => !s || s.match(/^\d+$/) || ['mon','tue','wed','thu','fri'].some(d => s.toLowerCase().startsWith('('+d));
 
                     if(!isGarbage(val) && val.length > 2) lines.push(val);
                     
-                    // Look ahead for multi-line cells (merged vertically)
                     let subR = r + 1;
                     while(subR < maxR) {
                         const subRow = workbookData[subR];
                         if(isRowBarrier(subRow)) break; 
-                        if(String(subRow[timeCol]||"").match(/\d{1,2}[:.]\d{2}/)) break; // Next time slot found
-                        
+                        if(String(subRow[timeCol]||"").match(/\d{1,2}[:.]\d{2}/)) break; 
                         const subVal = String(subRow[cIdx]||"").trim();
                         if(!isGarbage(subVal) && subVal.length > 2 && !lines.includes(subVal)) lines.push(subVal);
                         subR++;
                     }
-                    r = subR - 1; // Advance main loop
+                    r = subR - 1; 
                     
                     if(lines.length > 0) {
                         const raw = lines.join(" ");
@@ -887,12 +898,9 @@
                 if(matches.length) {
                     const dateHeader = document.createElement('div');
                     dateHeader.className = "flex items-center gap-2 mt-4 mb-2 pl-1";
-                    
-                    // Format date nicely
                     const dObj = DateUtils.parse(day.date);
                     const locale = currentLang === 'TR' ? 'tr-TR' : 'en-US';
                     const dateFormatted = dObj.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' });
-                    
                     dateHeader.innerHTML = `<span class="text-xs font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md uppercase tracking-wide">${dateFormatted}</span>`;
                     cont.appendChild(dateHeader);
                     
@@ -902,7 +910,7 @@
                         el.innerHTML = `<div class="font-bold text-slate-700 dark:text-slate-200">${m.lines[0]}</div><div class="text-xs text-slate-400 mt-1 flex items-center gap-1"><i class="far fa-clock"></i> ${m.time}</div>`;
                         el.onclick = () => {
                             document.getElementById('datePicker').value = day.date;
-                            renderDateStrip(); // Force slider sync
+                            renderDateStrip(); 
                             toggleSearch();
                         }
                         cont.appendChild(el);
@@ -942,7 +950,6 @@
             const times = ["08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30"];
             const subjsEN = ["Anatomy", "Histology", "Physiology", "Biochemistry", "Public Health", "Biophysics"];
             const subjsTR = ["Anatomi", "Histoloji", "Fizyoloji", "Biyokimya", "Halk Sağlığı", "Biyofizik"];
-            
             times.forEach(t => {
                 const row = new Array(20).fill("");
                 row[0] = t; row[9] = t;
@@ -965,9 +972,6 @@
             });
             return rows;
         }
-
     </script>
 </body>
 </html>
-
-
