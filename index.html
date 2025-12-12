@@ -768,10 +768,23 @@
 
         function updateDayProgress() {
             const now = new Date();
-            const start = new Date(now); start.setHours(8, 30, 0); 
-            const end = new Date(now); end.setHours(17, 30, 0);   
-            const percent = (now < start) ? 0 : (now > end) ? 100 : ((now - start) / (end - start)) * 100;
-            document.getElementById('dayProgressBar').style.width = `${percent}%`;
+            const start = new Date(now); start.setHours(8, 30, 0, 0); 
+            const end = new Date(now); end.setHours(17, 30, 0, 0);   
+            
+            const total = end - start;
+            const current = now - start;
+            
+            let percent = 0;
+            if (now < start) percent = 0;
+            else if (now > end) percent = 100;
+            else percent = (current / total) * 100;
+            
+            const bar = document.getElementById('dayProgressBar');
+            if(bar) {
+                // Remove loading specific classes if they exist
+                bar.classList.remove('animate-pulse', 'w-full'); 
+                bar.style.width = `${percent}%`;
+            }
         }
 
         window.goToToday = function() {
@@ -1188,7 +1201,23 @@
         function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
         function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
         function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
-        function setLoading(isLoading) { document.getElementById('loadingState').classList.toggle('hidden', !isLoading); }
+        
+        function setLoading(isLoading) {
+            document.getElementById('loadingState').classList.toggle('hidden', !isLoading);
+            
+            // Dual-purpose Progress Bar Logic
+            const bar = document.getElementById('dayProgressBar');
+            if (isLoading) {
+                // Loading State: Indeterminate / Searching look
+                // We use a specific width and pulse to show activity
+                bar.style.width = '70%'; // Fake progress
+                bar.classList.add('animate-pulse');
+            } else {
+                // Loaded State: Switch to Day Progress
+                bar.classList.remove('animate-pulse');
+                updateDayProgress();
+            }
+        }
     </script>
 </body>
 </html>
