@@ -146,21 +146,25 @@
                         
                         <!-- Desktop Only Buttons -->
                         <div class="hidden md:flex items-center gap-2">
-                            <button aria-label="Toggle Theme" id="themeToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
+                            <button aria-label="Toggle Theme" id="themeToggleBtn" class="btn-press h-9 w-9 lg:w-auto lg:px-3 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
                                 <i id="darkModeIcon" class="fas fa-circle-half-stroke text-xs"></i>
+                                <span id="txt-btn-theme" class="hidden lg:inline-block ml-2 text-xs font-bold tracking-wide">Theme</span>
                                 <span id="themeTooltip" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50 shadow-sm">Auto</span>
                             </button>
 
-                            <button aria-label="Cafeteria Menu" id="openMenuBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                            <button aria-label="Cafeteria Menu" id="openMenuBtn" class="btn-press h-9 w-9 lg:w-auto lg:px-3 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
                                 <i class="fas fa-utensils text-xs"></i>
+                                <span id="txt-btn-menu" class="hidden lg:inline-block ml-2 text-xs font-bold tracking-wide">Menu</span>
                             </button>
 
-                            <button aria-label="Switch View" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
+                            <button aria-label="Switch View" id="viewToggleBtn" class="btn-press h-9 w-9 lg:w-auto lg:px-3 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
                                 <i class="fas fa-columns text-xs"></i>
+                                <span id="txt-btn-view" class="hidden lg:inline-block ml-2 text-xs font-bold tracking-wide">View</span>
                             </button>
                             
-                             <button aria-label="Search" id="searchBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                             <button aria-label="Search" id="searchBtn" class="btn-press h-9 w-9 lg:w-auto lg:px-3 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
                                 <i class="fas fa-search text-xs"></i>
+                                <span id="txt-btn-search" class="hidden lg:inline-block ml-2 text-xs font-bold tracking-wide">Search</span>
                              </button>
                          </div>
                     </div>
@@ -371,7 +375,8 @@
                     installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
                     installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
                     installClose: "Got it",
-                    minLeft: "m left", startsIn: "Starts in"
+                    minLeft: "m left", startsIn: "Starts in",
+                    btnTheme: "Theme", btnMenu: "Menu", btnView: "View", btnSearch: "Search"
                 },
                 TR: {
                     title: "Dönem I", subtitle: "AYBÜ Tıp Fakültesi",
@@ -386,7 +391,8 @@
                     installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
                     installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
                     installClose: "Tamam",
-                    minLeft: "dk kaldı", startsIn: "Başlıyor:"
+                    minLeft: "dk kaldı", startsIn: "Başlıyor:",
+                    btnTheme: "Tema", btnMenu: "Yemek", btnView: "Görünüm", btnSearch: "Ara"
                 }
             };
 
@@ -1174,7 +1180,7 @@
                 else { trBtn.className = active.replace('text-blue-600', 'text-red-600 dark:text-red-400'); enBtn.className = inactive; }
 
                 const t = TRANSLATIONS[lang];
-                ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner-title', 'txt-install-banner-desc', 'txt-install-title', 'txt-install-close'].forEach(id => {
+                ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner-title', 'txt-install-banner-desc', 'txt-install-title', 'txt-install-close', 'txt-btn-theme', 'txt-btn-menu', 'txt-btn-view', 'txt-btn-search'].forEach(id => {
                     const el = document.getElementById(id);
                     const key = id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
                     if(el) {
