@@ -241,7 +241,7 @@
 
     <!-- Footer -->
     <footer class="w-full text-center py-6">
-        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">AYBU Medicine • v2.1 UI</div>
+        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">AYBU Medicine • v2.2 Fixed</div>
     </footer>
 
     <!-- Floating Today Button -->
@@ -258,10 +258,10 @@
         };
 
         const CONSTANTS = {
-            HOLIDAYS: ["holiday", "tatil", "sömestr", "semester", "break", "resmi", "ulusal", "cumhuriyet", "zafer", "emek", "demokrasi"],
-            NEW_YEAR: ["yılbaşı", "yilbasi", "new year", "noel", "yeni yıl"],
-            EID: ["ramazan", "ramadan", "eid", "bayram", "kurban", "seker"],
-            CLINICAL: ["clinical skills", "klinik beceri", "cst", "beceri"],
+            HOLIDAYS: ["holiday", "tatil", "sömestr", "semester", "yarıyıl", "break", "resmi", "ara tatil", "ulusal", "cumhuriyet", "zafer", "emek", "demokrasi"],
+            NEW_YEAR: ["yılbaşı", "yilbasi", "new year", "noel", "happy new year", "yeni yıl", "yeniyıl", "yeni yil"],
+            EID: ["ramazan", "ramadan", "eid", "bayram", "kurban", "seker", "şeker"],
+            CLINICAL: ["clinical skills", "clinical skill", "klinik beceri", "cst", "beceri eğitimi"],
             LAB_EXCLUDES: ["inkılab", "history"]
         };
 
@@ -337,7 +337,6 @@
             }
         };
 
-        // Improved Subject Color Hashing
         function getSubjectColor(subjectName) {
             let hash = 0;
             for (let i = 0; i < subjectName.length; i++) {
@@ -375,7 +374,7 @@
             }
 
             setInterval(updateDayProgress, 60000); 
-            setInterval(updateNowBadgeTimer, 60000); // Live countdown update
+            setInterval(updateNowBadgeTimer, 60000);
             initApp();
             checkInstallBanner();
         });
@@ -384,7 +383,6 @@
         async function initApp() {
             setLoading(true);
             
-            // 1. Try Cache
             try {
                 const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
                 if(stored) {
@@ -395,7 +393,6 @@
                 }
             } catch(e) { console.error(e); }
 
-            // 2. Fetch Fresh
             try {
                 const res = await fetch(CONFIG.SCHEDULE_FILENAME + '?v=' + Date.now());
                 if (!res.ok) throw new Error("Net fail");
@@ -422,7 +419,6 @@
                 if(!workbookData) {
                     workbookData = generateMockData();
                     refreshView();
-                    showToast("Demo Mode Enabled");
                 }
             }
             setLoading(false);
@@ -731,9 +727,7 @@
         function updateNowBadgeTimer() {
             const el = document.querySelector('.glow-border span'); 
             if(el && el.innerText.includes('Ends')) {
-               // Force re-render of current view to update time
-               // A full refresh is expensive, so ideally we'd just update text, but this is simple:
-               // In production, target specific ID. Here we rely on interval.
+               // Update logic handled by interval or refresh
             }
         }
 
@@ -772,16 +766,33 @@
         }
 
         function setLoading(b) { document.getElementById('loadingState').classList.toggle('hidden', !b); }
-        function showToast(msg) { /* Simple toast logic */ }
         function closeInstallModal() { document.getElementById('installModal').classList.add('hidden'); }
         function openInstallModal() { document.getElementById('installModal').classList.remove('hidden'); }
         function closeInstallBanner() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('installBannerDismissed', 'true'); }
         function checkInstallBanner() { if(!localStorage.getItem('installBannerDismissed') && !window.matchMedia('(display-mode: standalone)').matches) document.getElementById('installBanner').classList.remove('hidden'); }
 
-        // --- DATA FETCH & SEARCH (Simplified for brevity but functional) ---
+        // --- FIXED DATA PARSING LOGIC ---
+        
+        function isRowBarrier(row) {
+            if (!row || !Array.isArray(row)) return false;
+            for (let i = 0; i < row.length; i++) {
+                const val = row[i];
+                if (!val) continue;
+                // Barrier 1: Date Format
+                if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
+                // Barrier 2: Keywords like "Committee", "Week 2", etc.
+                if (typeof val === 'string') {
+                    const s = val.toLocaleLowerCase('tr-TR').trim();
+                    if (s.match(/^(committee|komite|phase|dönem|week|hafta)\s*[\dIVX.]+$/i) || s === 'week' || s === 'hafta') return true;
+                }
+            }
+            return false;
+        }
+
         function getClassesForDate(dateStr) {
             if(!workbookData) return [];
-            // Logic to find row index matching dateStr
+            
+            // 1. Find Row Index
             let rIdx = -1, cIdx = -1, isEn = currentLang === 'EN';
             for(let r=0; r<workbookData.length; r++) {
                 const row = workbookData[r];
@@ -796,17 +807,28 @@
             }
             if(rIdx === -1) return [];
 
-            // Extract items logic (simplified from original)
+            // 2. Extract Items with Barrier Detection
             const items = [];
-            // ... (Actual extraction logic presumed same as original Text 8, just compacted) ...
-            // RE-IMPLEMENTING EXTRACTION LOGIC INLINE FOR STABILITY:
-            let timeCol = isEn ? 9 : 0;
-            // Attempt to find time col header if possible, else default
+            
+            // Determine time column: scan near 8:30
+            let timeCol = -1;
+            for(let offset=1; offset<=4; offset++) {
+                const checkRow = workbookData[rIdx + offset];
+                if(checkRow) {
+                    for(let c=cIdx-1; c>=0; c--) {
+                        if(String(checkRow[c]||"").match(/^\d{1,2}[:.]\d{2}/)) { timeCol = c; break; }
+                    }
+                }
+                if(timeCol !== -1) break;
+            }
+            if(timeCol === -1) timeCol = isEn ? 9 : 0; // Fallback
             
             let r = rIdx + 1;
-            while(r < Math.min(workbookData.length, rIdx+60)) {
+            const maxR = Math.min(workbookData.length, rIdx + 60);
+
+            while(r < maxR) {
                 const row = workbookData[r];
-                if(String(row[0]).match(/\d{4}-\d{2}-\d{2}/)) break; // Stop at next date
+                if(isRowBarrier(row)) break; // STOP Extraction at barrier
 
                 const tVal = String(row[timeCol]||"").trim();
                 const tMatch = tVal.match(/(\d{1,2})[:.](\d{2})/);
@@ -815,17 +837,24 @@
                     const time = `${tMatch[1]}:${tMatch[2]}`;
                     const lines = [];
                     const val = String(row[cIdx]||"").trim();
-                    if(val.length > 2 && !val.match(/^(mon|tue|wed|thu|fri)/i)) lines.push(val);
                     
-                    // Look ahead for multi-line cells
+                    // Simple filter for garbage like "Mon", "Tue"
+                    const isGarbage = (s) => !s || s.match(/^\d+$/) || ['mon','tue','wed','thu','fri'].some(d => s.toLowerCase().startsWith('('+d));
+
+                    if(!isGarbage(val) && val.length > 2) lines.push(val);
+                    
+                    // Look ahead for multi-line cells (merged vertically)
                     let subR = r + 1;
-                    while(subR < workbookData.length) {
+                    while(subR < maxR) {
                         const subRow = workbookData[subR];
-                        if(String(subRow[timeCol]||"").match(/\d/)) break; // Next time slot
+                        if(isRowBarrier(subRow)) break; 
+                        if(String(subRow[timeCol]||"").match(/\d{1,2}[:.]\d{2}/)) break; // Next time slot found
+                        
                         const subVal = String(subRow[cIdx]||"").trim();
-                        if(subVal.length > 2) lines.push(subVal);
+                        if(!isGarbage(subVal) && subVal.length > 2 && !lines.includes(subVal)) lines.push(subVal);
                         subR++;
                     }
+                    r = subR - 1; // Advance main loop
                     
                     if(lines.length > 0) {
                         const raw = lines.join(" ");
@@ -847,11 +876,6 @@
             cont.classList.remove('hidden');
             if(term.length < 2) return;
 
-            // Basic search implementation
-            let count = 0;
-            // Iterate all days (requires full scan, implemented simplified here)
-            // In real app, reuse the indexing logic from original file
-            // For now, let's just show no results if we haven't built index
             if(searchIndexes[currentLang].length === 0) return;
 
             searchIndexes[currentLang].forEach(day => {
@@ -871,15 +895,12 @@
                             toggleSearch();
                         }
                         cont.appendChild(el);
-                        count++;
                     });
                 }
             });
-            document.getElementById('noSearchResults').classList.toggle('hidden', count > 0);
         }
 
         function buildSearchIndexes() {
-            // Re-use logic to populate searchIndexes
             if(!workbookData) return;
             searchIndexes = { EN: [], TR: [] };
             for(let r=0; r<workbookData.length; r++) {
@@ -896,13 +917,46 @@
         }
         
         function generateMockData() {
-            // ... (Same as original mock data logic) ...
-            const d = [];
-            // Mocking logic omitted for brevity, fallback to empty array or simple mock if needed
-            return d;
+            const rows = [];
+            const dateRow = new Array(20).fill("");
+            const today = new Date();
+            for(let i=0; i<20; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + (i - 2)); 
+                dateRow[i] = DateUtils.normalize(d);
+            }
+            rows.push(dateRow);
+            for(let i=0; i<4; i++) rows.push(new Array(20).fill(""));
+
+            const times = ["08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30"];
+            const subjsEN = ["Anatomy", "Histology", "Physiology", "Biochemistry", "Public Health", "Biophysics"];
+            const subjsTR = ["Anatomi", "Histoloji", "Fizyoloji", "Biyokimya", "Halk Sağlığı", "Biyofizik"];
+            
+            times.forEach(t => {
+                const row = new Array(20).fill("");
+                row[0] = t; row[9] = t;
+                for(let c=0; c<20; c++) {
+                    if(c === 0 || c === 9) continue;
+                    const dStr = dateRow[c];
+                    if(dStr) {
+                         const d = DateUtils.parse(dStr);
+                         if(d.getDay() === 0 || d.getDay() === 6) continue;
+                    }
+                    if(Math.random() > 0.4) {
+                        if(t === "12:30" || t === "13:30") row[c] = (c < 8) ? "Öğle Arası" : "Lunch";
+                        else {
+                            const pool = (c < 8) ? subjsTR : subjsEN;
+                            row[c] = pool[Math.floor(Math.random() * pool.length)] + (Math.random() > 0.7 ? " (Lab)" : "");
+                        }
+                    }
+                }
+                rows.push(row);
+            });
+            return rows;
         }
 
     </script>
 </body>
 </html>
+
 
