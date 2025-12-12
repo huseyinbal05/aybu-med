@@ -49,9 +49,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PREVENT DOUBLE TAP ZOOM */
-        html { touch-action: manipulation; }
-        body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; touch-action: manipulation; }
+        /* PREVENT DOUBLE TAP ZOOM & SIDE SCROLL */
+        html { 
+            touch-action: manipulation; 
+            overflow-x: hidden;
+            width: 100%;
+        }
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            overflow-x: hidden; 
+            touch-action: manipulation; 
+            width: 100%;
+            position: relative;
+        }
         
         .content-optimized { content-visibility: auto; contain-intrinsic-size: 100px; }
         .glow-border { position: relative; z-index: 1; transition: transform 0.3s ease; }
