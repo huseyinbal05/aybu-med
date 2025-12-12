@@ -749,6 +749,9 @@
                 const mBtn = document.getElementById('mobileViewBtn');
                 if(mBtn) mBtn.querySelector('i').className = `${iconClass} text-xl mb-0.5`;
 
+                const pickerVal = document.getElementById('datePicker').value;
+                if(pickerVal) updateDateDisplay(DateUtils.parse(pickerVal));
+
                 refreshView();
             }
 
@@ -1177,6 +1180,26 @@
             }
 
             function updateDateDisplay(dateObj) {
+                const displayEl = document.getElementById('dateDisplay');
+                
+                if (viewMode === 'week') {
+                     const current = new Date(dateObj);
+                     const day = current.getDay();
+                     const diff = current.getDate() - day + (day === 0 ? -6 : 1);
+                     const monday = new Date(current); 
+                     monday.setDate(diff);
+                     
+                     const friday = new Date(monday);
+                     friday.setDate(monday.getDate() + 4);
+                     
+                     const locale = currentLang === 'TR' ? 'tr-TR' : 'en-US';
+                     const startStr = monday.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+                     const endStr = friday.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+                     
+                     displayEl.innerHTML = `<span class="text-sm font-bold text-slate-700 dark:text-slate-200">${startStr} - ${endStr}</span>`;
+                     return;
+                }
+
                 const today = new Date();
                 const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
                 const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
@@ -1190,7 +1213,6 @@
                 else if (dStr === tomorrow.toDateString()) label = TRANSLATIONS[currentLang].tomorrow;
                 else if (dStr === yesterday.toDateString()) label = TRANSLATIONS[currentLang].yesterday;
                 
-                const displayEl = document.getElementById('dateDisplay');
                 if (label) {
                     displayEl.innerHTML = `<div class="flex flex-col items-center leading-none"><span class="text-[9px] text-blue-400 dark:text-blue-300 font-bold uppercase tracking-widest mb-0.5">${label}</span><span class="text-sm font-bold text-slate-800 dark:text-slate-200">${datePart}</span></div>`;
                 } else {
