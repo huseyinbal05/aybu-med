@@ -261,7 +261,7 @@
 
     <footer class="w-full max-w-6xl mx-auto px-4 py-6 text-center pb-24 md:pb-6">
         <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 tracking-widest uppercase">
-            AYBU Medicine Schedule • v2.5
+            AYBU Medicine Schedule • v2.6
         </div>
     </footer>
 
@@ -441,6 +441,13 @@
 
                 if(closeBtn) closeBtn.onclick = closeMenu;
                 modal.onclick = (e) => { if(e.target === modal) closeMenu(); };
+
+                // Background Fetch Strategy
+                // Trigger fetch shortly after load to populate cache/DOM
+                // Use requestIdleCallback if available for performance
+                const bgFetch = () => setTimeout(fetchMenuData, 1500);
+                if (window.requestIdleCallback) window.requestIdleCallback(bgFetch);
+                else bgFetch();
             }
 
             const MENU_CACHE_KEY = 'aybu_menu_cache_v2'; 
@@ -486,13 +493,15 @@
                         html: html
                     }));
                     processMenuHtml(html);
+                    loading.classList.add('hidden'); // Hide loading on success
                 } catch (aggregateError) {
                     console.error("All proxies failed", aggregateError);
+                    // Don't hide loading here if we want to show error state, 
+                    // but since it's background fetch, we should probably set error state in DOM
+                    // so it's ready when user opens.
                     loading.classList.add('hidden');
                     error.classList.remove('hidden');
                 }
-                
-                loading.classList.add('hidden');
             }
 
             function processMenuHtml(htmlContent) {
