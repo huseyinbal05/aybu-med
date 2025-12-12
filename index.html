@@ -228,11 +228,11 @@
             <div class="space-y-3">
                 <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
                     <i class="fab fa-apple text-2xl text-slate-800 dark:text-slate-200"></i>
-                    <div class="text-xs text-slate-600 dark:text-slate-300">Tap <span class="font-bold">Share</span> <i class='fas fa-share-square'></i> then <span class="font-bold">Add to Home Screen</span></div>
+                    <div id="txt-install-ios" class="text-xs text-slate-600 dark:text-slate-300">Tap <span class="font-bold">Share</span> <i class='fas fa-share-square'></i> then <span class="font-bold">Add to Home Screen</span></div>
                 </div>
                  <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
                     <i class="fab fa-android text-2xl text-green-500"></i>
-                    <div class="text-xs text-slate-600 dark:text-slate-300">Tap <span class="font-bold">Menu</span> <i class='fas fa-ellipsis-v'></i> then <span class="font-bold">Install App</span></div>
+                    <div id="txt-install-android" class="text-xs text-slate-600 dark:text-slate-300">Tap <span class="font-bold">Menu</span> <i class='fas fa-ellipsis-v'></i> then <span class="font-bold">Install App</span></div>
                 </div>
             </div>
             <button onclick="closeInstallModal()" class="mt-5 w-full bg-slate-900 dark:bg-blue-600 hover:opacity-90 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg" id="txt-install-close">Got it</button>
@@ -241,7 +241,7 @@
 
     <!-- Footer -->
     <footer class="w-full text-center py-6">
-        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest mb-2">AYBU Medicine • v2.7 Final</div>
+        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest mb-2">AYBU Medicine • v2.8 Final</div>
         <button onclick="hardReset()" class="text-[9px] text-slate-300 hover:text-rose-400 dark:text-slate-600 dark:hover:text-rose-400 underline transition-colors">Reset Data</button>
     </footer>
 
@@ -285,8 +285,11 @@
                 now: "NOW", lunch: "Lunch Break", freelance: "Self Study", today: "Today", tomorrow: "Tomorrow",
                 yesterday: "Yesterday", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 installBannerTitle: "Install App", installBannerDesc: "Faster loading & offline access",
+                installTitle: "Install App", installClose: "Got it",
                 weekendTitle: "Weekend Vibes", freelanceTitle: "Study Day", holidayTitle: "Holiday",
-                endsIn: "Ends in", startsIn: "Starts in"
+                endsIn: "Ends in", startsIn: "Starts in",
+                installIOS: "Tap <span class='font-bold'>Share</span> <i class='fas fa-share-square mx-1'></i> then <span class='font-bold'>Add to Home Screen</span>",
+                installAndroid: "Tap <span class='font-bold'>Menu</span> <i class='fas fa-ellipsis-v mx-1'></i> then <span class='font-bold'>Install App</span>"
             },
             TR: {
                 title: "Dönem I", subtitle: "AYBÜ Tıp",
@@ -294,8 +297,11 @@
                 now: "ŞU AN", lunch: "Öğle Arası", freelance: "Bireysel Çalışma", today: "Bugün", tomorrow: "Yarın",
                 yesterday: "Dün", badgeLab: "LAB", badgeClinical: "BECERİ",
                 installBannerTitle: "Uygulamayı Yükle", installBannerDesc: "Çevrimdışı ve hızlı erişim",
+                installTitle: "Uygulamayı Yükle", installClose: "Tamam",
                 weekendTitle: "Hafta Sonu", freelanceTitle: "Çalışma Günü", holidayTitle: "Tatil",
-                endsIn: "Bitiş:", startsIn: "Başlangıç:"
+                endsIn: "Bitiş:", startsIn: "Başlangıç:",
+                installIOS: "<span class='font-bold'>Paylaş</span> <i class='fas fa-share-square mx-1'></i>'a bas, sonra <span class='font-bold'>Ana Ekrana Ekle</span>",
+                installAndroid: "<span class='font-bold'>Menü</span> <i class='fas fa-ellipsis-v mx-1'></i>'ye bas, sonra <span class='font-bold'>Uygulamayı Yükle</span>"
             }
         };
 
@@ -467,6 +473,10 @@
                 const k = id.replace('txt-','').replace(/-([a-z])/g, g => g[1].toUpperCase());
                 if(el && t[k]) el.textContent = t[k];
             });
+
+            // HTML content updates for install guide (to preserve icons)
+            document.getElementById('txt-install-ios').innerHTML = t.installIOS;
+            document.getElementById('txt-install-android').innerHTML = t.installAndroid;
 
             document.getElementById('phase-icon').textContent = lang === 'EN' ? 'P1' : 'D1';
             
