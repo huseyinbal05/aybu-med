@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AYBU Schedule</title>
-    
-    <!-- PWA Meta Tags (Universal) -->
-    <meta name="theme-color" content="#ffffff">
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- iOS Specific Optimizations -->
+    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AYBU Sched">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/833/833593.png">
+    <meta name="theme-color" content="#ffffff">
     
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,10 +34,7 @@
             }
         }
     </script>
-    
-    <!-- Defer heavy libraries to unblock rendering -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js" defer></script>
-    
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -82,27 +72,17 @@
         })();
     </script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300 flex flex-col">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300">
 
-    <!-- Install Notification Banner -->
-    <div id="installBanner" class="hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-[gradientMove_5s_ease_infinite] text-white px-4 py-3 shadow-lg relative z-50 cursor-pointer border-b border-white/10" onclick="openInstallModal()">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-inner border border-white/10 animate-[bounce_2s_infinite]">
-                    <i class="fas fa-download text-white text-sm"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span id="txt-install-banner-title" class="font-bold text-sm tracking-wide leading-tight">Install App</span>
-                    <span id="txt-install-banner-desc" class="text-[11px] text-indigo-100/90 font-medium leading-tight">Get offline access & faster loading</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="hidden md:inline-block text-xs font-bold bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">Install</span>
-                <button aria-label="Close" onclick="event.stopPropagation(); closeInstallBanner()" class="text-white/60 hover:text-white p-2 -mr-2 hover:bg-white/10 rounded-full transition-colors">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
+    <!-- Install Notification Bar -->
+    <div id="installBanner" class="hidden bg-indigo-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-md relative z-50 cursor-pointer hover:bg-indigo-700 transition-colors" onclick="openInstallModal()">
+        <div class="flex items-center gap-2 mx-auto md:mx-0">
+            <i class="fas fa-mobile-alt text-indigo-200"></i>
+            <span id="txt-install-banner">Add to Home Screen</span>
         </div>
+        <button onclick="event.stopPropagation(); closeInstallBanner()" class="text-indigo-200 hover:text-white p-1">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <!-- Header -->
@@ -130,18 +110,17 @@
                         </div>
                         
                         <!-- Dark Mode Toggle -->
-                        <button aria-label="Toggle Theme" onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
-                            <i id="darkModeIcon" class="fas fa-circle-half-stroke text-xs"></i>
-                            <span id="themeTooltip" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50 shadow-sm">Auto</span>
+                        <button onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                            <i id="darkModeIcon" class="fas fa-moon text-xs"></i>
                         </button>
 
-                        <!-- View Toggle -->
-                        <button aria-label="Switch View" onclick="toggleViewMode()" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
+                        <!-- View Toggle (Day/Week) -->
+                        <button onclick="toggleViewMode()" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
                             <i class="fas fa-columns text-xs"></i>
                         </button>
                         
                         <!-- Search Button -->
-                         <button aria-label="Search" onclick="toggleSearch()" id="searchBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                         <button onclick="toggleSearch()" id="searchBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
                             <i class="fas fa-search text-xs"></i>
                         </button>
                     </div>
@@ -149,18 +128,18 @@
 
                 <!-- Date Controls -->
                 <div id="dateControls" class="flex items-center justify-between gap-2 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 dark:border-slate-700/50 shadow-sm w-full md:w-auto md:min-w-[320px]">
-                    <button aria-label="Previous Day" onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <button onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         <i class="fas fa-chevron-left text-xs"></i>
                     </button>
                     
                     <div class="relative flex-1 group h-10">
-                        <input aria-label="Date Picker" type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
+                        <input type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
                         <div class="flex items-center justify-center gap-3 w-full h-full bg-white dark:bg-slate-700 border border-slate-200/60 dark:border-slate-600 rounded-xl shadow-sm group-hover:border-blue-300 dark:group-hover:border-blue-500 transition-all px-2 cursor-pointer">
                             <div id="dateDisplay" class="flex-1 text-center select-none"></div>
                         </div>
                     </div>
 
-                    <button aria-label="Next Day" onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <button onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         <i class="fas fa-chevron-right text-xs"></i>
                     </button>
                 </div>
@@ -173,28 +152,19 @@
                     <input type="text" id="searchInput" placeholder="Search entire semester..." 
                            class="w-full pl-10 pr-10 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all text-sm font-medium placeholder:text-slate-400 dark:text-slate-200"
                            oninput="handleGlobalSearch(this.value)">
-                    <button aria-label="Close Search" onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <button onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
         </div>
         
-        <!-- Progress Bar Container -->
-        <div class="h-[3px] w-full bg-slate-100 dark:bg-slate-800 absolute bottom-0 left-0 group overflow-visible">
-            <!-- The Bar -->
-            <div id="dayProgressBar" class="h-full bg-gradient-to-r from-cyan-500 to-blue-600 w-0 transition-[width] duration-1000 ease-linear rounded-r-sm relative">
-                <!-- The "Bead" / Indicator (Visual cue that this is a timeline, not a loader) -->
-                <div id="progressBead" class="hidden absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-white dark:bg-slate-700 border-2 border-blue-600 dark:border-blue-400 rounded-full shadow-md z-10"></div>
-            </div>
-            <!-- Tooltip -->
-            <div class="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-800/90 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-0 backdrop-blur-sm shadow-sm">
-                Day Progress
-            </div>
+        <div class="h-[3px] w-full bg-slate-100 dark:bg-slate-800 absolute bottom-0 left-0">
+            <div id="dayProgressBar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 w-0 transition-[width] duration-1000 ease-linear rounded-r-sm"></div>
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 md:p-8 flex-1">
+    <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
         <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0"></div>
         <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 md:grid-cols-5 gap-4"></div>
         <div id="searchResultsContainer" class="hidden mt-4 space-y-4"></div>
@@ -211,8 +181,7 @@
              <p class="text-slate-400 dark:text-slate-500 text-sm">Try searching for a subject name or room.</p>
         </div>
 
-        <!-- VISIBLE BY DEFAULT FOR PERCEIVED PERFORMANCE -->
-        <div id="loadingState" class="w-full max-w-3xl mx-auto mt-8 px-2">
+        <div id="loadingState" class="hidden w-full max-w-3xl mx-auto mt-8 px-2">
             <div class="space-y-8 animate-pulse">
                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2"><div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div><div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div><div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div></div>
                 <div class="flex flex-row md:grid md:grid-cols-[100px_60px_1fr] md:gap-2"><div class="flex flex-col items-end pr-3 pt-4"><div class="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div></div><div class="flex flex-col items-center"><div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full border-4 border-slate-50 dark:border-slate-900"></div><div class="h-full w-0.5 bg-slate-200 dark:bg-slate-700 my-2"></div></div><div class="flex-1 pl-3"><div class="h-28 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div></div></div>
@@ -224,8 +193,8 @@
     
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700">
-            <button aria-label="Close Modal" onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
-            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App 🚀</h3>
+            <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App</h3>
             <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
                 <div class="text-3xl text-slate-800 dark:text-slate-200"><i class="fab fa-apple"></i></div>
                 <div><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">iOS (Safari)</h4><p id="txt-install-ios" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">1. Tap Share <i class='fas fa-share-square mx-1'></i><br>2. 'Add to Home Screen'</p></div>
@@ -238,14 +207,7 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="w-full max-w-6xl mx-auto px-4 py-6 text-center">
-        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 tracking-widest uppercase">
-            AYBU Medicine Schedule • v2.0
-        </div>
-    </footer>
-
-    <button aria-label="Go to Today" id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
+    <button id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
         <i class="fas fa-calendar-day text-xl group-hover:scale-110 transition-transform"></i>
     </button>
 
@@ -267,9 +229,13 @@
 
         // --- 2. UTILITIES ---
         const DateUtils = {
+            // Standardizes Excel date (potentially offset) to YYYY-MM-DD string
+            // Excel dates are often local, but sheetjs gives Date objects. 
+            // We use a safe offset to prevent timezone shifts (e.g., 23:00 previous day).
             normalize: (cellVal) => {
                 if (!cellVal) return null;
                 if (cellVal instanceof Date) {
+                    // Safe shift to ensure we are in the middle of the day to avoid edge case timezone flips
                     const safeDate = new Date(cellVal.getTime() + (12 * 60 * 60 * 1000));
                     return `${safeDate.getUTCFullYear()}-${String(safeDate.getUTCMonth() + 1).padStart(2, '0')}-${String(safeDate.getUTCDate()).padStart(2, '0')}`;
                 }
@@ -280,11 +246,14 @@
                 }
                 return null;
             },
+            
+            // Returns a safe Date object from YYYY-MM-DD
             parse: (dateStr) => {
                 if (!dateStr) return null;
                 const parts = dateStr.split('-');
                 return new Date(parts[0], parts[1] - 1, parts[2]);
             },
+
             getTodayString: () => {
                 const now = new Date();
                 const y = now.getFullYear();
@@ -316,7 +285,7 @@
 
         // --- 3. STATE ---
         let workbookData = null;
-        let searchIndexes = { EN: [], TR: [] }; 
+        let searchIndexes = { EN: [], TR: [] }; // Optimized dual index
         let currentLang = 'EN';
         let viewMode = 'day'; 
 
@@ -329,9 +298,7 @@
                 freelanceTitle: "Self-Study Day", holidayTitle: "Semester Break", newYearTitle: "Happy New Year!",
                 eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 fetchError: "Could not auto-load 'schedule.xlsx'.",
-                installBannerTitle: "Install App",
-                installBannerDesc: "Get offline access & faster loading",
-                installTitle: "Install App 🚀",
+                installBanner: "Add to Home Screen", installTitle: "Install App",
                 installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
                 installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
                 installClose: "Got it"
@@ -344,9 +311,7 @@
                 freelanceTitle: "Bireysel Çalışma Günü", holidayTitle: "İyi Tatiller!", newYearTitle: "Mutlu Yıllar!",
                 eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", 
                 fetchError: "'schedule.xlsx' bulunamadı.",
-                installBannerTitle: "Uygulamayı Yükle",
-                installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
-                installTitle: "Uygulamayı Yükle 🚀",
+                installBanner: "Ana Ekrana Ekle", installTitle: "Uygulamayı Yükle",
                 installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
                 installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
                 installClose: "Tamam"
@@ -364,69 +329,31 @@
         // --- 4. APP LOGIC ---
 
         document.addEventListener('DOMContentLoaded', () => {
-            initTheme(); initLang(); initDate();
+            initTheme();
+            initLang();
+            initDate();
             
-            // Register SW if available (Uncommented for Production)
-            if ('serviceWorker' in navigator) {
+            // Service Worker Register Placeholder
+            /* if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
-            }
+            } */
 
-            setInterval(updateDayProgress, 30000); 
+            setInterval(updateDayProgress, 60000); 
             initApp();
+            
             checkInstallBanner();
         });
 
-        // REFACTORED THEME LOGIC
-        let themeTooltipTimeout;
         function initTheme() {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const apply = () => {
                 const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
                 const isDark = saved === 'dark' || (!saved && mediaQuery.matches);
                 document.documentElement.classList.toggle('dark', isDark);
-                updateThemeIcon(saved, false); 
+                updateThemeIcon(isDark);
             };
             apply();
             mediaQuery.addEventListener('change', () => !localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) && apply());
-        }
-
-        function toggleDarkMode() {
-            if (navigator.vibrate) navigator.vibrate(5);
-            const current = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
-            let next = null;
-            if (current === null) next = 'light';
-            else if (current === 'light') next = 'dark';
-            else next = null; 
-
-            if (next) localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, next);
-            else localStorage.removeItem(CONFIG.STORAGE_KEYS.THEME);
-
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const isDark = next === 'dark' || (!next && mediaQuery.matches);
-            document.documentElement.classList.toggle('dark', isDark);
-            updateThemeIcon(next, true); 
-        }
-
-        function updateThemeIcon(state, showFeedback = false) {
-            const icon = document.getElementById('darkModeIcon');
-            const tooltip = document.getElementById('themeTooltip');
-            if(!icon) return;
-
-            let label = 'Auto';
-            if (state === 'light') { icon.className = 'fas fa-sun text-yellow-500 text-xs'; label = 'Light'; } 
-            else if (state === 'dark') { icon.className = 'fas fa-moon text-blue-400 text-xs'; label = 'Dark'; } 
-            else { icon.className = 'fas fa-circle-half-stroke text-slate-400 dark:text-slate-500 text-xs'; label = 'Auto'; }
-
-            if(tooltip) {
-                tooltip.textContent = label;
-                if (showFeedback) {
-                    tooltip.classList.remove('opacity-0'); tooltip.classList.add('opacity-100');
-                    clearTimeout(themeTooltipTimeout);
-                    themeTooltipTimeout = setTimeout(() => { tooltip.classList.remove('opacity-100'); tooltip.classList.add('opacity-0'); }, 1500); 
-                } else {
-                    tooltip.classList.remove('opacity-100'); tooltip.classList.add('opacity-0');
-                }
-            }
         }
 
         function initLang() {
@@ -451,9 +378,23 @@
             if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('installBannerDismissed')) {
                 const banner = document.getElementById('installBanner');
                 banner.classList.remove('hidden');
+                setTimeout(() => banner.classList.add('hidden'), 10000);
             }
         }
+
+        function toggleDarkMode() {
+            const isDark = !document.documentElement.classList.contains('dark');
+            document.documentElement.classList.toggle('dark', isDark);
+            updateThemeIcon(isDark);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, isDark ? 'dark' : 'light');
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('darkModeIcon');
+            if(icon) icon.className = isDark ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-xs';
+        }
         
+        // RE-ADDED MISSING FUNCTION
         window.toggleLanguage = function() {
             if (navigator.vibrate) navigator.vibrate(5);
             const newLang = currentLang === 'EN' ? 'TR' : 'EN';
@@ -514,15 +455,20 @@
 
         // --- 5. DATA ENGINE ---
 
+        // Optimized Builder: Builds both languages at once
         function buildSearchIndexes() {
             if (!workbookData) return;
             searchIndexes = { EN: [], TR: [] };
+            
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
                     const dateStr = DateUtils.normalize(row[c]);
                     if (dateStr) {
                         const langKey = c <= CONFIG.SPLIT_COLUMN_INDEX ? 'TR' : 'EN';
+                        // Reuse the extraction logic, but we need to trick it into thinking currentLang is correct
+                        // Or better, pass explicit column check. 
+                        // Simplified: Extract classes for this column.
                         const classes = extractClassesForColumn(r, c, langKey).filter(c => c.type !== 'lunch');
                         if (classes.length > 0) {
                             searchIndexes[langKey].push({ date: dateStr, items: classes });
@@ -532,11 +478,13 @@
             }
         }
 
+        // Refactored Extraction Logic
         function extractClassesForColumn(dateRowIndex, targetColIndex, langOverride = null) {
             const classes = [];
             const isEnglish = langOverride ? (langOverride === 'EN') : (currentLang === 'EN');
             let timeColIndex = -1;
 
+            // 1. Locate Time Column
             for(let offset = 1; offset <= 4; offset++) {
                 const checkRow = workbookData[dateRowIndex + offset];
                 if(checkRow) {
@@ -549,6 +497,7 @@
             }
             if (timeColIndex === -1) timeColIndex = isEnglish ? 9 : 0; 
 
+            // 2. Scan Rows below Date
             let r = dateRowIndex + 1;
             const maxRows = Math.min(workbookData.length, dateRowIndex + 60); 
 
@@ -571,6 +520,7 @@
                         if(s.length > 2) contentLines.push(s);
                     }
                     
+                    // 3. Handle Merged Rows (Lookahead)
                     let subR = r + 1;
                     while (subR < maxRows) {
                         const subRow = workbookData[subR];
@@ -587,9 +537,12 @@
                     }
                     r = subR - 1;
 
+                    // 4. Classify & Add
                     if (contentLines.length > 0) {
                         const rawJoined = contentLines.join(" ");
                         const { type, isLab, isClinical } = ClassTypeDetector.detect(rawJoined);
+                        
+                        // Override type if content suggests lunch explicitly
                         const finalType = type === 'lunch' ? 'lunch' : type;
                         
                         classes.push({ 
@@ -607,6 +560,7 @@
                 r++;
             }
             
+            // Deduplicate Lunches
             return classes.filter((cls, index, self) => 
                 cls.type !== 'lunch' || index === self.findIndex((t) => t.type === 'lunch')
             );
@@ -623,13 +577,18 @@
                 const noRes = document.getElementById('noSearchResults');
                 
                 if (term.length < 2) {
-                    container.innerHTML = ''; container.classList.add('hidden'); noRes.classList.add('hidden'); return;
+                    container.innerHTML = '';
+                    container.classList.add('hidden');
+                    noRes.classList.add('hidden');
+                    return;
                 }
 
-                container.classList.remove('hidden'); container.innerHTML = '';
+                container.classList.remove('hidden');
+                container.innerHTML = '';
                 
                 let count = 0;
                 const fragment = document.createDocumentFragment();
+                // Use the pre-built index for CURRENT language
                 const currentIndex = searchIndexes[currentLang];
 
                 for (const day of currentIndex) {
@@ -685,76 +644,48 @@
             refreshView();
         }
 
-        // UPDATED INIT APP (Stale-While-Revalidate with Optimistic UI)
         async function initApp() {
             setLoading(true);
-            let cachedData = null;
+            
+            // Try cache
+            const cachedData = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
+            if(cachedData) {
+                try {
+                    workbookData = JSON.parse(cachedData);
+                    completeInit();
+                    return; 
+                } catch(e) { console.error("Cache load error:", e); }
+            }
 
-            // 1. Fast Path: Load from LocalStorage
             try {
-                const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
-                if(stored) {
-                    cachedData = JSON.parse(stored);
-                    workbookData = cachedData;
-                    
-                    // Render View Immediately (optimistic update)
-                    refreshView(); 
-                    document.getElementById('todayBtn').classList.remove('hidden');
-                    setLoading(false); // Hide spinner, show content
-                    
-                    // Defer heavy indexing to next tick
-                    setTimeout(() => buildSearchIndexes(), 50);
-                }
-            } catch(e) { console.error("Cache load error:", e); }
-
-            // 2. Slow Path: Network & Parsing (background)
-            try {
+                // Try fetch
                 const response = await fetch(CONFIG.SCHEDULE_FILENAME + '?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("Auto-fetch failed");
-                
                 const arrayBuffer = await response.arrayBuffer();
-                
-                // Wait for XLSX to load if it was deferred
-                const waitForXLSX = () => new Promise(resolve => {
-                    if (window.XLSX) resolve();
-                    else document.querySelector('script[src*="xlsx"]').addEventListener('load', resolve);
-                });
-                await waitForXLSX();
-
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 let rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                 
-                const freshData = rawData.map(row => row.map(cell => {
-                    if (cell instanceof Date) return DateUtils.normalize(cell);
+                // Sanitize and Normalize Dates IMMEDIATELY
+                workbookData = rawData.map(row => row.map(cell => {
+                    if (cell instanceof Date) return DateUtils.normalize(cell); // Convert to YYYY-MM-DD
                     return cell;
                 }));
 
-                const freshString = JSON.stringify(freshData);
-                const cachedString = cachedData ? JSON.stringify(cachedData) : "";
-
-                if (freshString !== cachedString) {
-                    console.log("App Updated: New schedule data found.");
-                    workbookData = freshData;
-                    localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, freshString);
-                    completeInit(); // Re-render with new data
-                } else {
-                    console.log("App Up-to-date.");
-                    if(!cachedData) completeInit(); // If first run, render now
-                }
+                localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, JSON.stringify(workbookData));
+                completeInit();
 
             } catch (err) {
                 console.warn("Fetch failed (Demo Mode):", err);
-                // Only use mock data if we have NOTHING (no cache, no network)
-                if(!workbookData) {
-                    workbookData = generateMockData();
-                    completeInit();
-                    const toast = document.createElement('div');
-                    toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
-                    toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
-                    document.body.appendChild(toast);
-                    setTimeout(() => toast.remove(), 4000);
-                }
+                workbookData = generateMockData();
+                completeInit();
+                
+                // Demo Toast
+                const toast = document.createElement('div');
+                toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
+                toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
             }
         }
 
@@ -769,25 +700,10 @@
 
         function updateDayProgress() {
             const now = new Date();
-            const start = new Date(now); start.setHours(8, 30, 0, 0); 
-            const end = new Date(now); end.setHours(17, 30, 0, 0);   
-            
-            const total = end - start;
-            const current = now - start;
-            
-            let percent = 0;
-            if (now < start) percent = 0;
-            else if (now > end) percent = 100;
-            else percent = (current / total) * 100;
-            
-            const bar = document.getElementById('dayProgressBar');
-            const bead = document.getElementById('progressBead');
-            
-            if(bar) {
-                bar.classList.remove('animate-pulse'); 
-                bar.style.width = `${percent}%`;
-                if(bead) bead.classList.remove('hidden');
-            }
+            const start = new Date(now); start.setHours(8, 30, 0); 
+            const end = new Date(now); end.setHours(17, 30, 0);   
+            const percent = (now < start) ? 0 : (now > end) ? 100 : ((now - start) / (end - start)) * 100;
+            document.getElementById('dayProgressBar').style.width = `${percent}%`;
         }
 
         window.goToToday = function() {
@@ -844,17 +760,15 @@
             else { trBtn.className = active.replace('text-blue-600', 'text-red-600 dark:text-red-400'); enBtn.className = inactive; }
 
             const t = TRANSLATIONS[lang];
-            ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner-title', 'txt-install-banner-desc', 'txt-install-title', 'txt-install-close'].forEach(id => {
+            ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner', 'txt-install-title', 'txt-install-close'].forEach(id => {
                 const el = document.getElementById(id);
-                const key = id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-                if(el) {
-                    if (t[key]) el.textContent = t[key];
-                    else if (t[id.replace('txt-','')]) el.textContent = t[id.replace('txt-','')];
-                }
+                if(el) el.textContent = t[id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase())] || t[id.replace('txt-','')];
             });
             document.getElementById('phase-icon').textContent = t.logoText;
             document.getElementById('txt-install-ios').innerHTML = t.installIOS;
             document.getElementById('txt-install-android').innerHTML = t.installAndroid;
+
+            // Note: We don't need to rebuild index here anymore!
             
             const pickerDate = document.getElementById('datePicker').value;
             if(pickerDate) updateDateDisplay(DateUtils.parse(pickerDate));
@@ -888,6 +802,7 @@
             for (let i = 0; i < row.length; i++) {
                 const val = row[i];
                 if (!val) continue;
+                // Pre-check for simple date string YYYY-MM-DD which is now our standard in workbookData
                 if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
@@ -913,6 +828,7 @@
             let targetColIndex = -1;
             const isEnglish = currentLang === 'EN';
             
+            // Because we normalized data on load, strict string comparison works!
             outerLoop:
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
@@ -956,6 +872,7 @@
                  return;
             }
 
+            // Check for full day events
             const checkType = (type, title, msgs, icon) => {
                 if(classes.some(c => c.type === type)) {
                      showEmptyState(title, msgs, icon);
@@ -1129,7 +1046,7 @@
                 const now = new Date();
                 const curMins = now.getHours() * 60 + now.getMinutes();
                 const startMins = h * 60 + m;
-                let endMins = startMins + 59; 
+                let endMins = startMins + 50; 
                 return curMins >= startMins && curMins < endMins;
             } catch(e) { return false; }
         }
