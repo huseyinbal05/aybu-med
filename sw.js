@@ -1,33 +1,33 @@
-const CACHE_NAME = 'aybu-schedule-v1';
+const CACHE_NAME = 'aybu-schedule-v2'; // Bump version when you update code
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
 ];
 
-// Install Event: Cache Core Assets
+// 1. Install: Cache Static Assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching assets');
+      console.log('[SW] Pre-caching static assets');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
 });
 
-// Activate Event: Cleanup Old Caches
+// 2. Activate: Clean Old Caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Removing old cache', key);
+            console.log('[SW] Clearing old cache:', key);
             return caches.delete(key);
           }
         })
@@ -37,29 +37,43 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch Event: Network First for Data, Cache First for Assets
+// 3. Fetch: Smart Strategies
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Strategy: Network First for Schedule Data (ensure freshness)
+  // STRATEGY A: Network First (for Schedule Data)
+  // We want the latest schedule, but fallback to cache if offline.
   if (url.pathname.includes('schedule.xlsx')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Clone and cache the new schedule
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => caches.match(event.request)) // Fallback to cache if offline
+        .catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // Strategy: Cache First for everything else (UI, Libraries)
+  // STRATEGY B: Stale-While-Revalidate (for everything else)
+  // Serve cache immediately (fast!), but update cache in background for next time.
+  // This handles the Font Files (gstatic) automatically.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        // Only cache valid responses (prevents caching 404s or errors)
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return networkResponse;
+      }).catch(() => {
+        // Eat errors if offline and just rely on cache
+      });
+
+      // Return cache if we have it, otherwise wait for network
+      return cachedResponse || fetchPromise;
     })
   );
 });
