@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
+    <!-- Re-added Manifest Link -->
     <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -73,7 +74,7 @@
         })();
     </script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300 flex flex-col">
 
     <!-- Install Notification Banner -->
     <div id="installBanner" class="hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-[gradientMove_5s_ease_infinite] text-white px-4 py-3 shadow-lg relative z-50 cursor-pointer border-b border-white/10" onclick="openInstallModal()">
@@ -185,7 +186,7 @@
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
+    <main class="w-full max-w-6xl mx-auto p-4 md:p-8 flex-1">
         <div id="scheduleContainer" class="hidden mt-4 relative pl-1 pb-10 md:pl-0 md:pb-0"></div>
         <div id="weekContainer" class="hidden mt-4 grid grid-cols-1 md:grid-cols-5 gap-4"></div>
         <div id="searchResultsContainer" class="hidden mt-4 space-y-4"></div>
@@ -227,6 +228,13 @@
             <button onclick="closeInstallModal()" class="mt-6 w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-all shadow-lg" id="txt-install-close">Got it</button>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-6xl mx-auto px-4 py-6 text-center">
+        <div class="text-[10px] font-bold text-slate-300 dark:text-slate-700 tracking-widest uppercase">
+            AYBU Medicine Schedule • v2.0
+        </div>
+    </footer>
 
     <button aria-label="Go to Today" id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
         <i class="fas fa-calendar-day text-xl group-hover:scale-110 transition-transform"></i>
@@ -312,8 +320,10 @@
                 freelanceTitle: "Self-Study Day", holidayTitle: "Semester Break", newYearTitle: "Happy New Year!",
                 eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 fetchError: "Could not auto-load 'schedule.xlsx'.",
-                installBannerTitle: "Install App", installBannerDesc: "Get offline access & faster loading",
-                installTitle: "Install App 🚀", installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
+                installBannerTitle: "Install App",
+                installBannerDesc: "Get offline access & faster loading",
+                installTitle: "Install App 🚀",
+                installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
                 installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
                 installClose: "Got it"
             },
@@ -325,8 +335,10 @@
                 freelanceTitle: "Bireysel Çalışma Günü", holidayTitle: "İyi Tatiller!", newYearTitle: "Mutlu Yıllar!",
                 eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", 
                 fetchError: "'schedule.xlsx' bulunamadı.",
-                installBannerTitle: "Uygulamayı Yükle", installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
-                installTitle: "Uygulamayı Yükle 🚀", installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
+                installBannerTitle: "Uygulamayı Yükle",
+                installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
+                installTitle: "Uygulamayı Yükle 🚀",
+                installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
                 installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
                 installClose: "Tamam"
             }
@@ -345,9 +357,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTheme(); initLang(); initDate();
             
-            // Register SW if available
+            // Register SW if available (Uncommented for Production)
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').catch(() => {});
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
             }
 
             setInterval(updateDayProgress, 30000); 
@@ -492,7 +504,7 @@
             }
         }
 
-        // --- 5. DATA ENGINE (Updated Caching) ---
+        // --- 5. DATA ENGINE ---
 
         function buildSearchIndexes() {
             if (!workbookData) return;
