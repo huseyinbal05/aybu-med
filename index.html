@@ -1217,7 +1217,12 @@
                             // FIX: Stricter barrier detection.
                             // 1. Length must be short (e.g. "Committee 1" is short, "Committee 1 Assessment Hour" is long)
                             // 2. Should not contain lesson-specific keywords
-                            if (s.length < 30 && !s.includes('saati') && !s.includes('değerlendirme') && !s.includes('introduction')) {
+                            if (s.length < 30 && 
+                                !s.includes('saati') && 
+                                !s.includes('değerlendirme') && 
+                                !s.includes('introduction') &&
+                                !s.includes('panel') // Added for Oct 15 issue
+                               ) {
                                 return true;
                             }
                         }
