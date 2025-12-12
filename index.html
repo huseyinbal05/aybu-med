@@ -445,13 +445,12 @@
             }
 
             function processMenuHtml(html) {
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                const rawText = doc.body.innerText || "";
-                // Split by newline, trim, and remove empty lines
-                const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const text = doc.body.innerText || "";
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
                 const today = new Date();
-                // Update date display in modal
                 const dateDisplay = document.getElementById('menuDateDisplay');
                 if(dateDisplay) {
                      dateDisplay.textContent = today.toLocaleDateString(currentLang==='TR'?'tr-TR':'en-US', { weekday:'long', day:'numeric', month:'long' });
@@ -462,51 +461,40 @@
                     return;
                 }
 
-                // Reference days in Turkish Uppercase for robust matching
-                const daysMap = ["PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ", "PAZAR"];
-                
-                const dayIndex = today.getDay() - 1; // 0 for Monday
-                const todayName = daysMap[dayIndex]; // e.g. "PAZARTESİ"
+                const daysMap = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+                const todayName = daysMap[today.getDay() - 1];
 
-                let items = [];
                 let foundWeek = false;
                 let capturing = false;
+                let items = [];
+
+                // Regex for date range DD.MM.YYYY
+                const dateRegex = /(\d{2}\.\d{2}\.\d{4})\s*-\s*(\d{2}\.\d{2}\.\d{4})/;
 
                 for (const line of lines) {
-                    const lineUpper = line.toLocaleUpperCase('tr-TR');
-
-                    // 1. Detect Week Date Range (e.g., 20.11.2023 - 24.11.2023)
-                    // This signals the start of the menu table
-                    if (line.match(/(\d{2}\.\d{2}\.\d{4})\s*-\s*(\d{2}\.\d{2}\.\d{4})/)) {
-                        foundWeek = true; 
-                        capturing = false; // Reset capturing
+                    const match = line.match(dateRegex);
+                    if (match) {
+                        const [d1, m1, y1] = match[1].split('.');
+                        const [d2, m2, y2] = match[2].split('.');
+                        const start = new Date(`${y1}-${m1}-${d1}`);
+                        const end = new Date(`${y2}-${m2}-${d2}`);
+                        end.setHours(23,59,59);
+                        
+                        if (today >= start && today <= end) foundWeek = true;
+                        else foundWeek = false;
+                        
+                        capturing = false;
                         continue;
                     }
 
                     if (foundWeek) {
-                        // 2. Check if the line is a Day Header
-                        // We check if lineUpper matches any day in our list
-                        const matchedDay = daysMap.find(d => lineUpper === d || lineUpper.startsWith(d + ' '));
-
-                        if (matchedDay) {
-                            // If we found a day header, we update capturing status.
-                            // We only capture if this header matches TODAY.
-                            capturing = (matchedDay === todayName);
-                            continue; // Don't add the header itself to items
+                        if (daysMap.includes(line)) {
+                            capturing = (line === todayName);
+                            continue;
                         }
-
-                        // 3. Capture items
                         if (capturing) {
-                            // Stop triggers
-                            if (lineUpper.includes("HIZLI") || lineUpper.includes("İLETİŞİM") || lineUpper.includes("TOPLAM")) {
-                                capturing = false;
-                                break; 
-                            }
-                            
-                            // Basic noise filter (ignore very short lines)
-                            if (line.length > 2) {
-                                items.push(line);
-                            }
+                            if (line.includes("HIZLI ERİŞİM") || line.includes("İLETİŞİM") || line.includes("Kalite")) break;
+                            items.push(line);
                         }
                     }
                 }
@@ -1438,5 +1426,3 @@
 </div>
 </body>
 </html>
-
-
