@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
+    <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -74,7 +75,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-300">
 
-    <!-- Install Notification Banner (Inviting Redesign) -->
+    <!-- Install Notification Banner -->
     <div id="installBanner" class="hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-[gradientMove_5s_ease_infinite] text-white px-4 py-3 shadow-lg relative z-50 cursor-pointer border-b border-white/10" onclick="openInstallModal()">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -88,7 +89,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="hidden md:inline-block text-xs font-bold bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">Install</span>
-                <button onclick="event.stopPropagation(); closeInstallBanner()" class="text-white/60 hover:text-white p-2 -mr-2 hover:bg-white/10 rounded-full transition-colors">
+                <button aria-label="Close" onclick="event.stopPropagation(); closeInstallBanner()" class="text-white/60 hover:text-white p-2 -mr-2 hover:bg-white/10 rounded-full transition-colors">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -120,19 +121,18 @@
                         </div>
                         
                         <!-- Dark Mode Toggle -->
-                        <button onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
+                        <button aria-label="Toggle Theme" onclick="toggleDarkMode()" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 relative group">
                             <i id="darkModeIcon" class="fas fa-circle-half-stroke text-xs"></i>
-                            <!-- Feedback Tooltip: Controlled via JS now -->
                             <span id="themeTooltip" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50 shadow-sm">Auto</span>
                         </button>
 
-                        <!-- View Toggle (Day/Week) -->
-                        <button onclick="toggleViewMode()" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
+                        <!-- View Toggle -->
+                        <button aria-label="Switch View" onclick="toggleViewMode()" id="viewToggleBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700" title="Switch View">
                             <i class="fas fa-columns text-xs"></i>
                         </button>
                         
                         <!-- Search Button -->
-                         <button onclick="toggleSearch()" id="searchBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
+                         <button aria-label="Search" onclick="toggleSearch()" id="searchBtn" class="btn-press w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700">
                             <i class="fas fa-search text-xs"></i>
                         </button>
                     </div>
@@ -140,18 +140,18 @@
 
                 <!-- Date Controls -->
                 <div id="dateControls" class="flex items-center justify-between gap-2 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-2xl backdrop-blur-sm border border-white/50 dark:border-slate-700/50 shadow-sm w-full md:w-auto md:min-w-[320px]">
-                    <button onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <button aria-label="Previous Day" onclick="changeDay(-1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         <i class="fas fa-chevron-left text-xs"></i>
                     </button>
                     
                     <div class="relative flex-1 group h-10">
-                        <input type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
+                        <input aria-label="Date Picker" type="date" id="datePicker" class="opacity-0 absolute inset-0 w-full h-full z-20 cursor-pointer">
                         <div class="flex items-center justify-center gap-3 w-full h-full bg-white dark:bg-slate-700 border border-slate-200/60 dark:border-slate-600 rounded-xl shadow-sm group-hover:border-blue-300 dark:group-hover:border-blue-500 transition-all px-2 cursor-pointer">
                             <div id="dateDisplay" class="flex-1 text-center select-none"></div>
                         </div>
                     </div>
 
-                    <button onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <button aria-label="Next Day" onclick="changeDay(1)" class="btn-press w-10 h-10 flex flex-none items-center justify-center rounded-xl bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 shadow-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         <i class="fas fa-chevron-right text-xs"></i>
                     </button>
                 </div>
@@ -164,7 +164,7 @@
                     <input type="text" id="searchInput" placeholder="Search entire semester..." 
                            class="w-full pl-10 pr-10 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all text-sm font-medium placeholder:text-slate-400 dark:text-slate-200"
                            oninput="handleGlobalSearch(this.value)">
-                    <button onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <button aria-label="Close Search" onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -214,7 +214,7 @@
     
     <div id="installModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] max-w-sm w-full p-6 shadow-2xl animate-modal-pop relative border border-white/20 dark:border-slate-700">
-            <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <button aria-label="Close Modal" onclick="closeInstallModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
             <h3 id="txt-install-title" class="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">Install App 🚀</h3>
             <div class="flex items-start gap-4 mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-100 transition-colors">
                 <div class="text-3xl text-slate-800 dark:text-slate-200"><i class="fab fa-apple"></i></div>
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <button id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
+    <button aria-label="Go to Today" id="todayBtn" onclick="goToToday()" class="hidden fixed bottom-8 right-6 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 w-14 h-14 rounded-2xl shadow-2xl shadow-blue-900/20 border border-blue-50 dark:border-slate-600 flex items-center justify-center z-40 btn-press transition-all hover:bg-blue-50 dark:hover:bg-slate-600 group md:bottom-10 md:right-10" title="Go to Today">
         <i class="fas fa-calendar-day text-xl group-hover:scale-110 transition-transform"></i>
     </button>
 
@@ -250,13 +250,9 @@
 
         // --- 2. UTILITIES ---
         const DateUtils = {
-            // Standardizes Excel date (potentially offset) to YYYY-MM-DD string
-            // Excel dates are often local, but sheetjs gives Date objects. 
-            // We use a safe offset to prevent timezone shifts (e.g., 23:00 previous day).
             normalize: (cellVal) => {
                 if (!cellVal) return null;
                 if (cellVal instanceof Date) {
-                    // Safe shift to ensure we are in the middle of the day to avoid edge case timezone flips
                     const safeDate = new Date(cellVal.getTime() + (12 * 60 * 60 * 1000));
                     return `${safeDate.getUTCFullYear()}-${String(safeDate.getUTCMonth() + 1).padStart(2, '0')}-${String(safeDate.getUTCDate()).padStart(2, '0')}`;
                 }
@@ -267,14 +263,11 @@
                 }
                 return null;
             },
-            
-            // Returns a safe Date object from YYYY-MM-DD
             parse: (dateStr) => {
                 if (!dateStr) return null;
                 const parts = dateStr.split('-');
                 return new Date(parts[0], parts[1] - 1, parts[2]);
             },
-
             getTodayString: () => {
                 const now = new Date();
                 const y = now.getFullYear();
@@ -306,7 +299,7 @@
 
         // --- 3. STATE ---
         let workbookData = null;
-        let searchIndexes = { EN: [], TR: [] }; // Optimized dual index
+        let searchIndexes = { EN: [], TR: [] }; 
         let currentLang = 'EN';
         let viewMode = 'day'; 
 
@@ -319,10 +312,8 @@
                 freelanceTitle: "Self-Study Day", holidayTitle: "Semester Break", newYearTitle: "Happy New Year!",
                 eidTitle: "Eid Mubarak!", logoText: "P1", badgeLab: "LAB", badgeClinical: "SKILLS", 
                 fetchError: "Could not auto-load 'schedule.xlsx'.",
-                installBannerTitle: "Install App",
-                installBannerDesc: "Get offline access & faster loading",
-                installTitle: "Install App 🚀",
-                installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
+                installBannerTitle: "Install App", installBannerDesc: "Get offline access & faster loading",
+                installTitle: "Install App 🚀", installIOS: "1. Tap the Share icon <i class='fas fa-share-square mx-1'></i><br>2. Scroll down & tap 'Add to Home Screen'",
                 installAndroid: "1. Tap menu icon <i class='fas fa-ellipsis-v mx-1'></i><br>2. Tap 'Add to Home Screen' or 'Install App'",
                 installClose: "Got it"
             },
@@ -334,10 +325,8 @@
                 freelanceTitle: "Bireysel Çalışma Günü", holidayTitle: "İyi Tatiller!", newYearTitle: "Mutlu Yıllar!",
                 eidTitle: "İyi Bayramlar!", logoText: "D1", badgeLab: "LAB", badgeClinical: "BECERİ", 
                 fetchError: "'schedule.xlsx' bulunamadı.",
-                installBannerTitle: "Uygulamayı Yükle",
-                installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
-                installTitle: "Uygulamayı Yükle 🚀",
-                installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
+                installBannerTitle: "Uygulamayı Yükle", installBannerDesc: "Çevrimdışı erişim ve hızlı yükleme",
+                installTitle: "Uygulamayı Yükle 🚀", installIOS: "1. Paylaş simgesine dokunun <i class='fas fa-share-square mx-1'></i><br>2. Aşağı inip 'Ana Ekrana Ekle'yi seçin",
                 installAndroid: "1. Menü simgesine dokunun <i class='fas fa-ellipsis-v mx-1'></i><br>2. 'Ana Ekrana Ekle' veya 'Yükle'yi seçin",
                 installClose: "Tamam"
             }
@@ -354,31 +343,27 @@
         // --- 4. APP LOGIC ---
 
         document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            initLang();
-            initDate();
+            initTheme(); initLang(); initDate();
             
-            // Service Worker Register Placeholder
-            /* if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
-            } */
+            // Register SW if available
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            }
 
-            setInterval(updateDayProgress, 60000); 
+            setInterval(updateDayProgress, 30000); 
             initApp();
-            
             checkInstallBanner();
         });
 
-        // REFACTORED THEME LOGIC START
+        // REFACTORED THEME LOGIC
         let themeTooltipTimeout;
-
         function initTheme() {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const apply = () => {
                 const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
                 const isDark = saved === 'dark' || (!saved && mediaQuery.matches);
                 document.documentElement.classList.toggle('dark', isDark);
-                updateThemeIcon(saved, false); // False = don't flash tooltip on load
+                updateThemeIcon(saved, false); 
             };
             apply();
             mediaQuery.addEventListener('change', () => !localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) && apply());
@@ -388,20 +373,17 @@
             if (navigator.vibrate) navigator.vibrate(5);
             const current = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
             let next = null;
-
-            // Cycle: Auto (null) -> Light -> Dark -> Auto
             if (current === null) next = 'light';
             else if (current === 'light') next = 'dark';
-            else next = null; // Back to auto
+            else next = null; 
 
             if (next) localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, next);
             else localStorage.removeItem(CONFIG.STORAGE_KEYS.THEME);
 
-            // Apply immediately
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const isDark = next === 'dark' || (!next && mediaQuery.matches);
             document.documentElement.classList.toggle('dark', isDark);
-            updateThemeIcon(next, true); // True = flash tooltip for feedback
+            updateThemeIcon(next, true); 
         }
 
         function updateThemeIcon(state, showFeedback = false) {
@@ -409,41 +391,22 @@
             const tooltip = document.getElementById('themeTooltip');
             if(!icon) return;
 
-            // State can be 'light', 'dark', or null (auto)
             let label = 'Auto';
-            if (state === 'light') {
-                icon.className = 'fas fa-sun text-yellow-500 text-xs';
-                label = 'Light';
-            } else if (state === 'dark') {
-                icon.className = 'fas fa-moon text-blue-400 text-xs';
-                label = 'Dark';
-            } else {
-                // Auto
-                icon.className = 'fas fa-circle-half-stroke text-slate-400 dark:text-slate-500 text-xs';
-                label = 'Auto';
-            }
+            if (state === 'light') { icon.className = 'fas fa-sun text-yellow-500 text-xs'; label = 'Light'; } 
+            else if (state === 'dark') { icon.className = 'fas fa-moon text-blue-400 text-xs'; label = 'Dark'; } 
+            else { icon.className = 'fas fa-circle-half-stroke text-slate-400 dark:text-slate-500 text-xs'; label = 'Auto'; }
 
             if(tooltip) {
                 tooltip.textContent = label;
-                
                 if (showFeedback) {
-                    // Reset animation
-                    tooltip.classList.remove('opacity-0');
-                    tooltip.classList.add('opacity-100');
-                    
+                    tooltip.classList.remove('opacity-0'); tooltip.classList.add('opacity-100');
                     clearTimeout(themeTooltipTimeout);
-                    themeTooltipTimeout = setTimeout(() => {
-                        tooltip.classList.remove('opacity-100');
-                        tooltip.classList.add('opacity-0');
-                    }, 1500); // Disappear after 1.5s
+                    themeTooltipTimeout = setTimeout(() => { tooltip.classList.remove('opacity-100'); tooltip.classList.add('opacity-0'); }, 1500); 
                 } else {
-                    // Ensure hidden if not feedback (e.g. on load)
-                    tooltip.classList.remove('opacity-100');
-                    tooltip.classList.add('opacity-0');
+                    tooltip.classList.remove('opacity-100'); tooltip.classList.add('opacity-0');
                 }
             }
         }
-        // REFACTORED THEME LOGIC END
 
         function initLang() {
             const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.LANG);
@@ -471,7 +434,6 @@
             }
         }
         
-        // RE-ADDED MISSING FUNCTION
         window.toggleLanguage = function() {
             if (navigator.vibrate) navigator.vibrate(5);
             const newLang = currentLang === 'EN' ? 'TR' : 'EN';
@@ -530,22 +492,17 @@
             }
         }
 
-        // --- 5. DATA ENGINE ---
+        // --- 5. DATA ENGINE (Updated Caching) ---
 
-        // Optimized Builder: Builds both languages at once
         function buildSearchIndexes() {
             if (!workbookData) return;
             searchIndexes = { EN: [], TR: [] };
-            
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
                 for (let c = 0; c < row.length; c++) {
                     const dateStr = DateUtils.normalize(row[c]);
                     if (dateStr) {
                         const langKey = c <= CONFIG.SPLIT_COLUMN_INDEX ? 'TR' : 'EN';
-                        // Reuse the extraction logic, but we need to trick it into thinking currentLang is correct
-                        // Or better, pass explicit column check. 
-                        // Simplified: Extract classes for this column.
                         const classes = extractClassesForColumn(r, c, langKey).filter(c => c.type !== 'lunch');
                         if (classes.length > 0) {
                             searchIndexes[langKey].push({ date: dateStr, items: classes });
@@ -555,13 +512,11 @@
             }
         }
 
-        // Refactored Extraction Logic
         function extractClassesForColumn(dateRowIndex, targetColIndex, langOverride = null) {
             const classes = [];
             const isEnglish = langOverride ? (langOverride === 'EN') : (currentLang === 'EN');
             let timeColIndex = -1;
 
-            // 1. Locate Time Column
             for(let offset = 1; offset <= 4; offset++) {
                 const checkRow = workbookData[dateRowIndex + offset];
                 if(checkRow) {
@@ -574,7 +529,6 @@
             }
             if (timeColIndex === -1) timeColIndex = isEnglish ? 9 : 0; 
 
-            // 2. Scan Rows below Date
             let r = dateRowIndex + 1;
             const maxRows = Math.min(workbookData.length, dateRowIndex + 60); 
 
@@ -597,7 +551,6 @@
                         if(s.length > 2) contentLines.push(s);
                     }
                     
-                    // 3. Handle Merged Rows (Lookahead)
                     let subR = r + 1;
                     while (subR < maxRows) {
                         const subRow = workbookData[subR];
@@ -614,12 +567,9 @@
                     }
                     r = subR - 1;
 
-                    // 4. Classify & Add
                     if (contentLines.length > 0) {
                         const rawJoined = contentLines.join(" ");
                         const { type, isLab, isClinical } = ClassTypeDetector.detect(rawJoined);
-                        
-                        // Override type if content suggests lunch explicitly
                         const finalType = type === 'lunch' ? 'lunch' : type;
                         
                         classes.push({ 
@@ -637,7 +587,6 @@
                 r++;
             }
             
-            // Deduplicate Lunches
             return classes.filter((cls, index, self) => 
                 cls.type !== 'lunch' || index === self.findIndex((t) => t.type === 'lunch')
             );
@@ -654,18 +603,13 @@
                 const noRes = document.getElementById('noSearchResults');
                 
                 if (term.length < 2) {
-                    container.innerHTML = '';
-                    container.classList.add('hidden');
-                    noRes.classList.add('hidden');
-                    return;
+                    container.innerHTML = ''; container.classList.add('hidden'); noRes.classList.add('hidden'); return;
                 }
 
-                container.classList.remove('hidden');
-                container.innerHTML = '';
+                container.classList.remove('hidden'); container.innerHTML = '';
                 
                 let count = 0;
                 const fragment = document.createDocumentFragment();
-                // Use the pre-built index for CURRENT language
                 const currentIndex = searchIndexes[currentLang];
 
                 for (const day of currentIndex) {
@@ -721,48 +665,63 @@
             refreshView();
         }
 
+        // UPDATED INIT APP (Stale-While-Revalidate)
         async function initApp() {
             setLoading(true);
-            
-            // Try cache
-            const cachedData = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
-            if(cachedData) {
-                try {
-                    workbookData = JSON.parse(cachedData);
-                    completeInit();
-                    return; 
-                } catch(e) { console.error("Cache load error:", e); }
-            }
+            let cachedData = null;
 
+            // 1. Load Cache Immediately
             try {
-                // Try fetch
+                const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA);
+                if(stored) {
+                    cachedData = JSON.parse(stored);
+                    workbookData = cachedData;
+                    completeInit(); 
+                    // Do NOT return here. Continue to fetch updates.
+                }
+            } catch(e) { console.error("Cache load error:", e); }
+
+            // 2. Fetch Latest Data
+            try {
                 const response = await fetch(CONFIG.SCHEDULE_FILENAME + '?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("Auto-fetch failed");
+                
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 let rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                 
-                // Sanitize and Normalize Dates IMMEDIATELY
-                workbookData = rawData.map(row => row.map(cell => {
-                    if (cell instanceof Date) return DateUtils.normalize(cell); // Convert to YYYY-MM-DD
+                const freshData = rawData.map(row => row.map(cell => {
+                    if (cell instanceof Date) return DateUtils.normalize(cell);
                     return cell;
                 }));
 
-                localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, JSON.stringify(workbookData));
-                completeInit();
+                // 3. Compare & Update
+                const freshString = JSON.stringify(freshData);
+                const cachedString = cachedData ? JSON.stringify(cachedData) : "";
+
+                if (freshString !== cachedString) {
+                    console.log("App Updated: New schedule data found.");
+                    workbookData = freshData;
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.DATA, freshString);
+                    // Re-init with new data
+                    completeInit();
+                } else {
+                    console.log("App Up-to-date.");
+                    if(!cachedData) completeInit(); // If no cache was there, init now
+                }
 
             } catch (err) {
                 console.warn("Fetch failed (Demo Mode):", err);
-                workbookData = generateMockData();
-                completeInit();
-                
-                // Demo Toast
-                const toast = document.createElement('div');
-                toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
-                toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
+                if(!workbookData) {
+                    workbookData = generateMockData();
+                    completeInit();
+                    const toast = document.createElement('div');
+                    toast.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full shadow-lg text-xs font-bold z-50 animate-fade-in-up border border-amber-200 pointer-events-none";
+                    toast.innerHTML = "<i class='fas fa-info-circle mr-2'></i>Demo Mode: Using Mock Data";
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                }
             }
         }
 
@@ -792,11 +751,8 @@
             const bead = document.getElementById('progressBead');
             
             if(bar) {
-                // Remove loading specific classes if they exist
                 bar.classList.remove('animate-pulse'); 
                 bar.style.width = `${percent}%`;
-                
-                // Show the bead for the timeline look
                 if(bead) bead.classList.remove('hidden');
             }
         }
@@ -857,21 +813,15 @@
             const t = TRANSLATIONS[lang];
             ['txt-title', 'txt-subtitle', 'txt-loading', 'txt-install-banner-title', 'txt-install-banner-desc', 'txt-install-title', 'txt-install-close'].forEach(id => {
                 const el = document.getElementById(id);
-                // Handle different possible key mappings
                 const key = id.replace('txt-','').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-                // Also check direct key 'installBannerTitle' etc.
                 if(el) {
-                    // Try direct match first (e.g. installBannerTitle)
                     if (t[key]) el.textContent = t[key];
-                    // Else try with id stripped
                     else if (t[id.replace('txt-','')]) el.textContent = t[id.replace('txt-','')];
                 }
             });
             document.getElementById('phase-icon').textContent = t.logoText;
             document.getElementById('txt-install-ios').innerHTML = t.installIOS;
             document.getElementById('txt-install-android').innerHTML = t.installAndroid;
-
-            // Note: We don't need to rebuild index here anymore!
             
             const pickerDate = document.getElementById('datePicker').value;
             if(pickerDate) updateDateDisplay(DateUtils.parse(pickerDate));
@@ -905,7 +855,6 @@
             for (let i = 0; i < row.length; i++) {
                 const val = row[i];
                 if (!val) continue;
-                // Pre-check for simple date string YYYY-MM-DD which is now our standard in workbookData
                 if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return true;
                 if (typeof val === 'string') {
                     const s = val.toLocaleLowerCase('tr-TR').trim();
@@ -931,7 +880,6 @@
             let targetColIndex = -1;
             const isEnglish = currentLang === 'EN';
             
-            // Because we normalized data on load, strict string comparison works!
             outerLoop:
             for (let r = 0; r < workbookData.length; r++) {
                 const row = workbookData[r];
@@ -975,7 +923,6 @@
                  return;
             }
 
-            // Check for full day events
             const checkType = (type, title, msgs, icon) => {
                 if(classes.some(c => c.type === type)) {
                      showEmptyState(title, msgs, icon);
@@ -1149,8 +1096,6 @@
                 const now = new Date();
                 const curMins = now.getHours() * 60 + now.getMinutes();
                 const startMins = h * 60 + m;
-                // UPDATED: Extended to 59 minutes to keep the current slot active during the break
-                // This prevents the "NOW" badge from disappearing 10 mins before the next class
                 let endMins = startMins + 59; 
                 return curMins >= startMins && curMins < endMins;
             } catch(e) { return false; }
@@ -1220,19 +1165,12 @@
         
         function setLoading(isLoading) {
             document.getElementById('loadingState').classList.toggle('hidden', !isLoading);
-            
-            // Dual-purpose Progress Bar Logic
             const bar = document.getElementById('dayProgressBar');
             const bead = document.getElementById('progressBead');
-            
             if (isLoading) {
-                // Loading State: Indeterminate / Searching look
-                // We use a specific width and pulse to show activity
-                bar.style.width = '70%'; // Fake progress
-                bar.classList.add('animate-pulse');
-                if(bead) bead.classList.add('hidden'); // Hide bead during loading
+                bar.style.width = '70%'; bar.classList.add('animate-pulse');
+                if(bead) bead.classList.add('hidden');
             } else {
-                // Loaded State: Switch to Day Progress
                 bar.classList.remove('animate-pulse');
                 updateDayProgress();
             }
