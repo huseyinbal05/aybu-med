@@ -348,7 +348,7 @@
                 parse: (dateStr) => {
                     if (!dateStr) return null;
                     const parts = dateStr.split('-');
-                    // Check if parts are valid numbers
+                    if (parts.length !== 3) return null;
                     const y = parseInt(parts[0]);
                     const m = parseInt(parts[1]) - 1;
                     const d = parseInt(parts[2]);
@@ -1011,48 +1011,49 @@
                     const fragment = document.createDocumentFragment();
                     const currentIndex = searchIndexes[currentLang];
 
-                    for (const day of currentIndex) {
-                        const matches = day.items.filter(item => item.raw.toLowerCase().includes(term));
-                        if (matches.length > 0) {
-                            const dateObj = DateUtils.parse(day.date);
-                            // Skip if date parsing failed
-                            if (!dateObj) continue;
+                    if (currentIndex) {
+                        for (const day of currentIndex) {
+                            const matches = day.items.filter(item => item.raw.toLowerCase().includes(term));
+                            if (matches.length > 0) {
+                                const dateObj = DateUtils.parse(day.date);
+                                if (!dateObj) continue; // Skip invalid dates
 
-                            const dateHeader = document.createElement('div');
-                            dateHeader.className = "flex items-center gap-2 mt-6 mb-2 px-2";
-                            dateHeader.innerHTML = `
-                                <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">${dateStrDisplay}</span>
-                                <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
-                            `;
-                            fragment.appendChild(dateHeader);
-
-                            matches.forEach(item => {
-                                const card = document.createElement('div');
-                                card.className = "bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-[0.98]";
-                                card.onclick = () => jumpToDate(day.date);
-                                
-                                let highlightClass = "text-slate-800 dark:text-slate-200";
-                                if(item.isLab) highlightClass = "text-rose-600 dark:text-rose-400";
-                                if(item.isClinical) highlightClass = "text-violet-600 dark:text-violet-400";
-
-                                const line0 = highlightMatch(item.lines[0], term);
-                                const line1 = item.lines.length > 1 ? highlightMatch(item.lines[1], term) : '';
-
-                                card.innerHTML = `
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <div class="font-bold text-sm ${highlightClass}">${line0}</div>
-                                            ${item.lines.length > 1 ? `<div class="text-xs text-slate-500 mt-1">${line1}</div>` : ''}
-                                        </div>
-                                        <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded-lg ml-3">${item.time}</span>
-                                    </div>
+                                const dateHeader = document.createElement('div');
+                                dateHeader.className = "flex items-center gap-2 mt-6 mb-2 px-2";
+                                dateHeader.innerHTML = `
+                                    <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">${dateObj.toLocaleDateString(currentLang==='TR'?'tr-TR':'en-US', { weekday:'short', month:'short', day:'numeric' })}</span>
+                                    <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
                                 `;
-                                fragment.appendChild(card);
-                                count++;
-                            });
+                                fragment.appendChild(dateHeader);
+
+                                matches.forEach(item => {
+                                    const card = document.createElement('div');
+                                    card.className = "bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-[0.98]";
+                                    card.onclick = () => jumpToDate(day.date);
+                                    
+                                    let highlightClass = "text-slate-800 dark:text-slate-200";
+                                    if(item.isLab) highlightClass = "text-rose-600 dark:text-rose-400";
+                                    if(item.isClinical) highlightClass = "text-violet-600 dark:text-violet-400";
+
+                                    const line0 = highlightMatch(item.lines[0], term);
+                                    const line1 = item.lines.length > 1 ? highlightMatch(item.lines[1], term) : '';
+
+                                    card.innerHTML = `
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <div class="font-bold text-sm ${highlightClass}">${line0}</div>
+                                                ${item.lines.length > 1 ? `<div class="text-xs text-slate-500 mt-1">${line1}</div>` : ''}
+                                            </div>
+                                            <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded-lg ml-3">${item.time}</span>
+                                        </div>
+                                    `;
+                                    fragment.appendChild(card);
+                                    count++;
+                                });
+                            }
+                            if (count >= 50) break;
                         }
-                        if (count >= 50) break;
                     }
 
                     container.appendChild(fragment);
