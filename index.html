@@ -882,11 +882,16 @@
                 
                 while (r < maxRows) {
                     const row = workbookData[r];
-                    if (isRowBarrier(row)) break;
-
+                    // Calculate time FIRST to determine if it's a lesson row
                     const timeVal = timeColIndex !== -1 ? String(row[timeColIndex]).trim() : "";
                     const timeMatch = timeVal.match(/(\d{1,2})[:.](\d{2})/);
                     
+                    // CRITICAL FIX: Only check for barrier if this is NOT a lesson row (no time).
+                    // This prevents lessons with "Komite" in the title from being treated as barriers.
+                    if (!timeMatch) {
+                        if (isRowBarrier(row)) break;
+                    }
+
                     if (timeMatch) {
                         let timeSlot = `${timeMatch[1]}:${timeMatch[2]}`;
                         const hour = parseInt(timeMatch[1]);
@@ -901,9 +906,12 @@
                         let subR = r + 1;
                         while (subR < maxRows) {
                             const subRow = workbookData[subR];
-                            if (isRowBarrier(subRow)) break; 
+                            // Check if next row has time (is next lesson)
                             const nextTime = String(subRow[timeColIndex] || "").trim();
                             if (nextTime.match(/\d{1,2}[:.]\d{2}/)) break; 
+                            
+                            // Check if next row is barrier (only if no time, implicit)
+                            if (isRowBarrier(subRow)) break; 
                             
                             const nextVal = subRow[targetColIndex];
                             if (nextVal && !isGarbageContent(nextVal)) {
@@ -1199,7 +1207,8 @@
                         if(val[4] === '-' && val.length === 10) return true; 
                         const s = val.toLocaleLowerCase('tr-TR').trim();
                         if (s === 'week' || s === 'hafta') return true;
-                        if (s.startsWith('committee') || s.startsWith('komite') || s.startsWith('phase') || s.startsWith('dönem')) return true;
+                        // FIX: Only treat as barrier if short (Header) to avoid matching long lesson titles
+                        if ((s.startsWith('committee') || s.startsWith('komite') || s.startsWith('phase') || s.startsWith('dönem')) && s.length < 40) return true;
                     }
                 }
                 return false;
@@ -1211,7 +1220,8 @@
                 if (s.length === 0 || s.includes("GMT") || /^\d+$/.test(s)) return true;
                 if (['mon','tue','wed','thu','fri'].some(d => s.toLowerCase().startsWith('('+d))) return true;
                 const lower = s.toLocaleLowerCase('tr-TR');
-                if (lower === 'week' || lower === 'hafta' || lower.startsWith('komite') || lower.startsWith('committee')) return true;
+                // FIX: Removed 'komite'/'committee' from garbage filter
+                if (lower === 'week' || lower === 'hafta') return true;
                 return false;
             }
 
